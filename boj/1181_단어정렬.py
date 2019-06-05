@@ -14,14 +14,23 @@ def compare(x, y):
 			return 0
 
 num = int(input())
-
-words = {}
+' df '.strip()
+words = set()
 for n in range(num):
-    word = input()
-    try:
-        words[word] += 1
-    except KeyError:
-        words[word] = 1
+    words.add(input())
 
-for word in sorted(words.keys(),key=cmp_to_key(compare)):
+for word in sorted(words,key=lambda x:(len(x),x)):
     print(word)
+'''
+i
+im
+it
+no
+but
+more
+wait
+wont
+yours
+cannot
+hesitate
+'''
