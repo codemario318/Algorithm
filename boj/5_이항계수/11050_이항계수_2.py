@@ -17,13 +17,14 @@
 10
 
 '''
-F = {}
+F = {0:1,1:1}
 
 def factorial(n):
-    result = 1
-    for i in range(2,n+1):
-        result *= i
-    return result
+    if n <= 1:
+        return 1
+    else:
+        F[n] = n * factorial(n-1)
+        return F[n]
 
 n,k = map(int,input().split())
-print(factorial(n)/(factorial(k)*factorial(n-k))%10007)
+print(factorial(n)//(factorial(k)*factorial(n-k))%10007)
