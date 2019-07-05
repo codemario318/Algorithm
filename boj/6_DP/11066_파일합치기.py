@@ -99,31 +99,88 @@ ACM-ICPC > Regionals > Asia > Korea > Nationwide Internet Competition
 #     for s in dp:print(s)
 #     print()
 #     for o in opt:print(o)
+# ################################################################################
+# from sys import stdin
+# input = stdin.readline
+#
+# for _ in range(int(input())):
+#     n = int(input())
+#     opt = {(i-1,i):i for i in range(1,n+1)}
+#     files = list(map(int,input().split()))
+#     sums = [0]
+#     for s in files:
+#         sums.append(sums[-1]+s)
+#
+#     dp = {}
+#     for i in range(n+2):
+#         dp[i,i] = 0
+#         dp[i,i+1] = 0
+#         try:
+#             dp[i,i+2] = files[i]+files[i+1]
+#         except:
+#             continue
+#
+#     for d in range(2,n+1):
+#         for i in range(n-d+1):
+#             dp[i,i+d] = float('inf')
+#             dp[i,i+d], opt[i,i+d] = min(((dp[i,k]+dp[k,i+d],k) for k in range(opt[i,d+i-1],opt[i+1,i+d]+1)))
+#             dp[i,i+d] += sums[i+d]-sums[i]
+#
+#     print(dp[0,n])
 ################################################################################
-from sys import stdin
-input = stdin.readline
+# from sys import stdin
+# input = stdin.readline
+#
+# def dp(n,sums):
+#     mem = []
+#     knuth = []
+#     for i in range(n+2):
+#         dp[i,i] = 0
+#         dp[i,i+1] = 0
+#         try:
+#             dp[i,i+2] = files[i]+files[i+1]
+#         except:
+#             continue
+#
+#     for d in range(2,n+1):
+#         for i in range(n-d+1):
+#             dp[i,i+d] = float('inf')
+#             dp[i,i+d], opt[i,i+d] = min(((dp[i,k]+dp[k,i+d],k) for k in range(opt[i,d+i-1],opt[i+1,i+d]+1)))
+#             dp[i,i+d] += sums[i+d]-sums[i]
+#     return
+#
+# for _ in range(int(input())):
+#     n = int(input())
+#     sums = [0]
+#
+#     for s in map(int,input().split()):
+#         sums.append(sums[-1]+s)
+#
+#     print(dp(n,sums))
+
+
+import sys
+input = sys.stdin.readline
+
+def dp(sums, n):
+    dp = [[], [0]*n, [sums[i+2] - sums[i] for i in range(n-1)]]
+    knuth = [1]*(n-1)
+
+    for d in range(3, n+1):
+        dp_temp, knuth_temp = [], []
+        for i in range(n-d+1):
+            min_sum, opt_k = min(((dp[k][i]+dp[d-k][i+k],k) for k in range(knuth[i], knuth[i+1]+2)),key=lambda x:x[0])
+            dp_temp.append(min_sum + sums[i+d]-sums[i])
+            knuth_temp.append(opt_k)
+        dp.append(dp_temp)
+        knuth = knuth_temp
+
+    return dp[n][0]
 
 for _ in range(int(input())):
     n = int(input())
-    opt = {(i-1,i):i for i in range(1,n+1)}
-    files = list(map(int,input().split()))
     sums = [0]
-    for s in files:
-        sums.append(sums[-1]+s)
 
-    dp = {}
-    for i in range(n+2):
-        dp[i,i] = 0
-        dp[i,i+1] = 0
-        try:
-            dp[i,i+2] = files[i]+files[i+1]
-        except:
-            continue
-
-    for d in range(2,n+1):
-        for i in range(n-d+1):
-            dp[i,i+d] = float('inf')
-            dp[i,i+d], opt[i,i+d] = min(((dp[i,k]+dp[k,i+d],k) for k in range(opt[i,d+i-1],opt[i+1,i+d]+1)))
-            dp[i,i+d] += sums[i+d]-sums[i]
-
-    print(dp[0,n])
+    for chapter in map(int, input().split()):
+        sums.append(sums[-1] + chapter)
+    print(dp(sums, n))
