@@ -28,18 +28,21 @@ m = 4
 n = 3
 puddles = [[2,2]]
 
-def go(pos):
-    return [maps[x-1][y],maps[x+1][y], maps[x][y-1], maps[x-1][y+1]]
-
-def dp(pos):
-
-    return
 def solution(m, n, puddles):
     global maps
-    maps = [[float('inf')]*(m+2)]+[[float('inf')]+[1]*(m)+[float('inf')] for _ in range(n)]+[[float('inf')]*(m+2)]
+    maps = [[-1]*(m+2)]+[[-1]+[0]*(m)+[-1] for _ in range(n)]+[[-1]*(m+2)]
+    maps[1][1] = 1
     for x,y in puddles:
-        maps[x][y] = float('inf')
-    for y in range(1,m+1):
-        for x in range(1,n+1):
+        maps[x][y] = -1
 
-    return answer
+    for x in range(1,n+1):
+        for y in range(1,m+1):
+            if maps[x][y] == -1:
+                continue
+            for wx,wy in ((0,1),(1,0)):
+                if maps[x-wx][y-wy] != -1:
+                    maps[x][y] += maps[x-wx][y-wy]
+
+    return maps[n][m]%1000000007
+
+solution(m,n,puddles)
