@@ -40,30 +40,77 @@ K	travel	return
 '''
 True if {} else False
 travel = [[500, 200, 200, 100], [800, 370, 300, 120], [700, 250, 300, 90]]
-
+#
+# def solution(K, travel):
+#     answer = 0
+#     N = len(travel)
+#     cache = []
+#     for i in range(1,N):
+#         awt, awc, abt, abc = travel[i-1]
+#         bwt, bwc, bbt, bbc = travel[i]
+#         cache.append([
+#             [awt+bwt,awc+bwc],
+#             [abt+bbt,abc+bbc],
+#             [abt+bwt,abc+bwc],
+#             [awt+bbt,awc+bbc]])
+#
+#     for i in range(1,len(cache)):
+#         for j in range(4):
+#             for k in range(4):
+#                 (prev_time, prev_cost), (next_time, next_cost) = cache[i-1][j],cache[i][k]
+#                 if prev_time + next_time <= K:
+#                     cost = prev_cost + next_cost
+#                     if cost > answer:
+#                         answer = cost
+#     print(answer)
+#     return cache
+#
+# solution(1650,[[500, 200, 200, 100], [800, 370, 300, 120], [700, 250, 300, 90]])
+# solution(3000,[[1000, 2000, 300, 700], [1100, 1900, 400, 900], [900, 1800, 400, 700], [1200, 2300, 500, 1200]])
+# ###################################################################################
+# def solution(K, travel):
+#     def dp(path):
+#         try:
+#             return cache[path]
+#         except KeyError:
+#             temp = travel[len(path)-1][:2] if path[-1] == 'w' else travel[len(path)-1][2:]
+#             cache[path] = list(map(sum,zip(dp(path[:-1]),temp)))
+#         return cache[path]
+#
+#     answer = 0
+#     N = len(travel)
+#     cache = {'w':travel[0][:2],'b':travel[0][2:]}
+#
+#     paths = ['w','b']
+#     for _ in range(N-1):
+#         temp = []
+#         for path in paths:
+#             for type in ('w','b'):
+#                 next = path + type
+#                 res = dp(next)
+#                 if res[0] <= K:
+#                     answer = max(res[1],answer)
+#                     temp.append(next)
+#         paths = temp
+#     return answer
+#
+# solution(1650,[[500, 200, 200, 100], [800, 370, 300, 120], [700, 250, 300, 90]])
+# solution(3000,[[1000, 2000, 300, 700], [1100, 1900, 400, 900], [900, 1800, 400, 700], [1200, 2300, 500, 1200]])
+################################################################################
 def solution(K, travel):
-    answer = 0
     N = len(travel)
-    cache = []
-    for i in range(1,N):
-        awt, awc, abt, abc = travel[i-1]
-        bwt, bwc, bbt, bbc = travel[i]
-        cache.append([
-            [awt+bwt,awc+bwc],
-            [abt+bbt,abc+bbc],
-            [abt+bwt,abc+bwc],
-            [awt+bbt,awc+bbc]])
+    cache = [0 for _ in range(K+1)]
 
-    for i in range(1,len(cache)):
-        for j in range(4):
-            for k in range(4):
-                (prev_time, prev_cost), (next_time, next_cost) = cache[i-1][j],cache[i][k]
-                if prev_time + next_time <= K:
-                    cost = prev_cost + next_cost
-                    if cost > answer:
-                        answer = cost
-    print(answer)
-    return cache
+    for walk_time, walk_cost, bike_time, bike_cost in travel:
+        temp = [0 for _ in range(K+1)]
+
+        for time in range(K+1):
+            walk = cache[time-walk_time] + walk_cost if time >= walk_time and cache[time-walk_time] != -1 else -1
+            bike = cache[time-bike_time] + bike_cost if time >= bike_time and cache[time-bike_time] != -1 else -1
+            temp[time] = max(walk,bike)
+        cache = temp
+
+    return cache[-1]
 
 solution(1650,[[500, 200, 200, 100], [800, 370, 300, 120], [700, 250, 300, 90]])
 solution(3000,[[1000, 2000, 300, 700], [1100, 1900, 400, 900], [900, 1800, 400, 700], [1200, 2300, 500, 1200]])
