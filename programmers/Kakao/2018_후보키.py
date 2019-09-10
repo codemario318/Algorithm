@@ -53,3 +53,33 @@ relation	result
 입출력 예 #1
 문제에 주어진 릴레이션과 같으며, 후보 키는 2개이다.
 '''
+relation = [["100","ryan","music","2"],["200","apeach","math","2"],["300","tube","computer","3"],["400","con","computer","4"],["500","muzi","music","3"],["600","apeach","music","2"]]
+
+from collections import Counter
+from itertools import combinations
+
+def solution(relation):
+    keys = []
+    answer = 0
+    N = len(relation)
+    cols = list(zip(*relation))
+    flag = True
+    for n in range(1,len(cols)+1):
+        for combi in combinations(range(len(cols)),n):
+            flag = True
+            for key in keys:
+                t = len(set(combi))
+                if len(set(combi) - set(key)) != len(combi):
+                    flag = False
+                    break
+            if flag == True:
+                col = []
+                for c in combi:
+                    col.append(cols[c])
+                if len(Counter(zip(*col))) == N:
+                    answer += 1
+                    keys.append(combi)
+    print(keys)
+    return answer
+
+solution(relation)
