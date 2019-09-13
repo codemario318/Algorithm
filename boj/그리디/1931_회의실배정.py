@@ -54,16 +54,11 @@ input = stdin.readline
 
 N = int(input())
 times = [list(map(int,input().split())) for _ in range(N)]
-times.sort()
-time_table = []
-
-for i in range(N):
-    finish = times[i][1]
-    count = 1
-    for j in range(i+1,N):
-        if finish <= times[j][0]:
-            count += 1
-            finish = times[j][1]
-    time_table.append(count)
-
-print(max(time_table))
+times.sort(key=lambda x: (x[1],x[0]))
+finish = times[0][1]
+count = 1
+for i in range(1,N):
+    if finish <= times[i][0]:
+        count += 1
+        finish = times[i][1]
+print(count)
