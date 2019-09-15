@@ -56,21 +56,16 @@ homes.sort()
 left = 1
 right = 1000000000
 mid = right//2
-a = 0
-while left+1 != right and a < 50:
-    a += 1
-    print('left:',left,'mid:',mid,'right:',right)
+
+while left+1 != right:
     count = 1
     prev = homes[0]
 
     for i in range(1,N):
         if homes[i] - prev >= mid:
-            print('prev:',prev,'next:',homes[i])
             count += 1
             prev = homes[i]
-    print('count:',count)
-    # if count == C:
-    #     break
+
     if count < C:
         right = mid
     else:
