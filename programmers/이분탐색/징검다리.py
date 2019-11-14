@@ -45,7 +45,7 @@ def solution(distance, rocks, n):
     while left+1 != right:
         mid = sum(divmod(left+right,2))
         print(left,mid,right)
-        count = 0
+
         prev_rock = 0
 
         for i in range(len(rocks)):

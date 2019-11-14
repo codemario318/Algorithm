@@ -27,9 +27,10 @@
 
 입력
 
-첫 번째 줄에는 테스트 케이스의 T(1 ≤ T ≤ 100)가 주어진다. 각 테스트 케이스마다
+첫 번째 줄에는 테스트 케이스의 T(1 ≤ T ≤ 100)가 주어진다.
+각 테스트 케이스마다 첫 번째 줄에 3개의 정수
+n, m, t (2 ≤ n ≤ 2 000, 1 ≤ m ≤ 50 000 and 1 ≤ t ≤ 100)가 주어진다.
 
-첫 번째 줄에 3개의 정수 n, m, t (2 ≤ n ≤ 2 000, 1 ≤ m ≤ 50 000 and 1 ≤ t ≤ 100)가 주어진다.
 각각 교차로, 도로, 목적지 후보의 개수이다.
 
 두 번째 줄에 3개의 정수 s, g, h (1 ≤ s, g, h ≤ n)가 주어진다.
@@ -107,11 +108,62 @@ ACM-ICPC > Regionals > Europe > Northwestern European Regional Contest > Benelux
 메모
 메모 작성하기
 '''
+# from sys import stdin
+# from heapq import heappop, heappush
+# input = lambda: map(int,stdin.readline().split())
+#
+# def search(s):
+#     D = [float('inf') for _ in range(node_num+1)]
+#     D[s] = 0
+#     q = [(0,s)]
+#
+#     while q:
+#         w,p = heappop(q)
+#
+#         if D[p] < w:
+#             continue
+#         for nw,np in graph[p]:
+#             if D[np] > nw+w:
+#                 D[np] = nw+w
+#                 heappush(q,(D[np],np))
+#     return D
+#
+# T = int(stdin.readline())
+#
+# for _ in range(T):
+#     node_num,edge_num,cand_num = input()
+#     S,G,H = input()
+#
+#     graph = [list() for _ in range(node_num+1)]
+#
+#     for _ in range(edge_num):
+#         a,b,d = input()
+#         d*= 2
+#         if (a == G and b == H) or (a == H and b == G):
+#             graph[a].append((d-1, b))
+#             graph[b].append((d-1, a))
+#         else:
+#             graph[a].append((d, b))
+#             graph[b].append((d, a))
+#
+#     cand = [int(stdin.readline()) for _ in range(cand_num)]
+#
+#     res = search(S)
+#     answer = []
+#
+#     for c in cand:
+#         if res[c]%2 == 1:
+#             answer.append(c)
+#
+#     answer.sort()
+#     print(' '.join(map(str,answer)))
+
+
 from sys import stdin
 from heapq import heappop, heappush
 input = lambda: map(int,stdin.readline().split())
 
-def search(s,f):
+def search(s):
     D = [float('inf') for _ in range(node_num+1)]
     D[s] = 0
     q = [(0,s)]
@@ -119,11 +171,14 @@ def search(s,f):
     while q:
         w,p = heappop(q)
 
-        for nw,np in graph[p]:
+        if D[p] < w:
+            continue
+        for np in graph[p]:
+            nw = graph[p][np]
             if D[np] > nw+w:
                 D[np] = nw+w
                 heappush(q,(D[np],np))
-    return D[f]
+    return D
 
 T = int(stdin.readline())
 
@@ -131,25 +186,21 @@ for _ in range(T):
     node_num,edge_num,cand_num = input()
     S,G,H = input()
 
-    graph = [list() for _ in range(node_num+1)]
+    graph = [dict() for _ in range(node_num+1)]
 
     for _ in range(edge_num):
         a,b,d = input()
-        graph[a].append((d,b))
-        graph[b].append((d,a))
+        d*= 2
+        graph[a][b] = d
+        graph[b][a] = d
 
     cand = [int(stdin.readline()) for _ in range(cand_num)]
-    answer = []
-    gh = search(G,H)
-    sg = search(S,G) + gh
-    sh = search(S,H) + gh
-    # print(sg,sh)
-    for c in cand:
-        use_gh = min(sg+search(H,c),sh+search(G,c))
 
-        if use_gh == search(S,c):
-            heappush(answer,c)
+    graph[G][H] -= 1
+    graph[H][G] -= 1
 
+    res = search(S)
+    answer = [ c for c in cand if res[c]%2 == 1]
+
+    answer.sort()
     print(' '.join(map(str,answer)))
-
-# '9'>'14'
