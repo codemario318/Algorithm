@@ -30,36 +30,26 @@ RGB거리에 사는 사람들은 집을 빨강, 초록, 파랑중에 하나로 �
 빠진 조건을 찾은 사람: djm03178
 데이터를 추가한 사람: rdd6584
 '''
-from sys import stdin
+from sys import stdin,setrecursionlimit
+setrecursionlimit(10000)
+nxt = [(1,2),(0,2),(0,1)]
 
-def paint(pattern):
-    try:
-        return cache[pattern]
-    except KeyError:
-        cache[pattern] = data[len(pattern)-1][cn[pattern[-1]]] + paint(pattern[:-1])
-        return cache[pattern]
+def rgb(n,s,c):
+    if n == N:
+        return 0
+    if cache[n][s][c] != -1:
+        return cache[n][s][c]
+    cache[n][s][c] = min(map(lambda x: rgb(n+1,s,x) + costs[n][x] ,nxt[c]))
+    return cache[n][s][c]
 
-def make_permut():
-    patterns = ['R','G','B']
+N = int(stdin.readline())
+costs = [ list(map(int,stdin.readline().split())) for _ in range(N)]
+cache = [[[-1 for _ in range(3)] for _ in range(3)] for _ in range(N)]
+res = float('inf')
 
-    while(True):
-        temp = []
-        for pattern in patterns:
-            iter = ['R','G','B']
-            iter.pop(cn[pattern[-1]])
-            for c in iter:
-                temp.append(pattern + c)
-        i = len(patterns)
-        patterns = temp
+res = min(map(lambda x: rgb(1,x,x)+ costs[0][x],range(3)))
 
-        if len(temp[-1]) == n:
-            return patterns
+print(res)
 
-n = int(stdin.readline())
-
-data = [list(map(int,stdin.readline().split())) for _ in range(n)]
-
-cn = {'R':0,'G':1,'B':2}
-cache = {'R':data[0][0],'G':data[0][1],'B':data[0][2]}
-
-print(min(map(paint,make_permut())))
+# print()
+# for c in cache:print(c)
