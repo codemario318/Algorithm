@@ -1,5 +1,5 @@
 from sys import stdin
-read_to_int_arr = lambda: map(int, stdin.readline().split())
+read_to_int_arr = lamb ada: map(int, stdin.readline().split())
 
 def two_pointer(target, nums):
     N = len(nums)

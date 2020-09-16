@@ -1,3 +1,6 @@
+1 not in {}
+
+None == 0
 '''
 문제 설명
 [본 문제는 정확성과 효율성 테스트 각각 점수가 있는 문제입니다.]
@@ -32,7 +35,15 @@ words	queries	result
 "fro???"는 "frozen"에 매치되므로 1입니다.
 "pro?"는 매치되는 가사 단어가 없으므로 0 입니다.
 '''
+class Node:
+    def __init__(self):
+        self.key = 1
+        self.nxt = 0
 
+a = Node()
+b = a.nxt
+b = 10
+a.nxt
 # wild = re.compile('[a-z]+')
 # wild.search('???').span()
 # 'fro???'[0:3]
