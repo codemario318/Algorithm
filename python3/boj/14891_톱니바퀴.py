@@ -128,98 +128,42 @@ N극은 0, S극은 1로 나타나있다.
 모든 기어의 회전상태를 저장할 배열을 만들고 이전 다음 중 바뀐 쪽에 맞추어 변경
     0:회전안함, 1:시계방향, -1:반시계 방향
     [0, 0, 0, 0, 0, 0] -> 앞 뒤로 하나씩 더 붙여 표현할지, 0,3 조건문으로 할지 고르기
-
-
-def change_gear(cur, change_states):
-    if cur == 0 or 5:
-        return
-    
-    if change_states[cur-1]:
-        nxt_d = 방향 얻기
-        change_gear(cur+1,next_d)
-
-    if change_states[cur+1]:
-        nxt_d = 방향 얻기
-        change_gear(cur-1,next_d)
-
-    return
-
-def get_direction(cur,prev,change_states):
-    prev_gear = gears[prev][change_state[prev]]
-    cur_gear = gears[cur][0]
-
-    if prev_gear == cur_gear:
-        gear[cur].rotate(-1)
-    else:
-        gear[cur].rotate(1)
-    
-    return
-
-def calc_gears(gears):
-    res = 0
-
-    for i in range(N):
-        if gears[i][0]:
-            res += 2**(i+1)
-    
-    return res
 '''
 
 from sys import stdin
 from collections import deque
-input = stdin.readline
+readline = stdin.readline
 N = 4
-
-def change_gear(cur, states):
-    for gear in gears:
-        print(gear)
-    print()
-    print(states)
-    if cur == 1 or cur == N:
-        return
-    
-    if states[cur-1] == 0:
-        change_state(cur-1,cur,states)
-        change_gear(cur-1,states)
-
-    if states[cur+1] == 0:
-        change_state(cur+1,cur,states)
-        change_gear(cur+1,states)
+TOP = 0
+RIGHT = 2
+LEFT = 6
+TEETH = {
+    1: (2, 6),
+    -1: (6, 2)
+}
 
 
-def change_state(cur,nxt,states):
-    cur_gear = gears[cur][states[cur]]
-    nxt_gear = gears[nxt][0]
+def turn(gears, r, cur, prev):
+    step = cur - prev
+    prev_tooth, cur_tooth = TEETH[step]
 
-    if nxt_gear == cur_gear:
-        states[nxt] = -1
-        gears[nxt].rotate(-1)
-    else:
-        states[nxt] = 1
-        gears[nxt].rotate(1)
-    
-def isCompare(gear_a,gear_b,states):
+    if 0 <= cur < N:
+        if gears[prev][prev_tooth-r] != gears[cur][cur_tooth]:
+            gears[cur].rotate(r)
+            turn(gears, r*-1, cur+step, cur)
 
-    return
 
-def calc_gears(gears):
-    res = 0
+res = 0
+gears = [deque(readline().strip()) for _ in range(N)]
+cmds = [list(map(int, readline().split())) for _ in range(int(readline()))]
 
-    for i in range(N):
-        if gears[i][0] == '1':
-            res += 2**i
-    
-    return res
+for i, r in cmds:
+    idx = i-1
+    gears[idx].rotate(r)
+    turn(gears, r*-1, idx-1, idx)
+    turn(gears, r*-1, idx+1, idx)
 
-gears = [deque(input().strip()) for _ in range(N)]
+for i in range(N):
+    res += int(gears[i][0]) * (2 ** i)
 
-M = int(input())
-moves = [map(int,input().split()) for _ in range(M)]
-
-for g,d in moves:
-    states = [0 for _ in range(N+2)]
-    states[g] = d
-    print(states)
-    change_gear(g,states)
-
-print(calc_gears(gears))
+print(res)
