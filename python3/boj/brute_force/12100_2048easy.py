@@ -49,11 +49,10 @@
 데이터를 추가한 사람: clrmt noorycode
 문제의 오타를 찾은 사람: doju
 '''
-from sys import stdin, setrecursionlimit
+from sys import stdin
 from itertools import chain
 from copy import deepcopy
 
-setrecursionlimit(3200000)
 COUNT = 5
 readline = stdin.readline
 
