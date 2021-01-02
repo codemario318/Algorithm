@@ -23,6 +23,22 @@
 55-50+40
 예제 출력 1
 -35
+
+1-2+3
+-4
+
+0+50-40-25+40-125
+-180
+
+10-1-3+5
+1
+
+0+0
+0
+
+05+060
+65
+
 출처
 문제를 번역한 사람: baekjoon
 잘못된 조건을 찾은 사람: windflower
@@ -32,9 +48,32 @@
 메모
 메모 작성하기
 '''
-import re
-s = '55-50+40'
-s = input()
+from sys import stdin
 
-re.split('[0-9]',s)
-re.split('[+,-]',s)
+
+def readline():
+    return stdin.readline()
+
+
+def solution(exp):
+    res = 0
+    num = ''
+    sign = 1
+
+    for n in exp:
+        if n == '-' or n == '+':
+            res += int(num)*sign
+            if n == '-':
+                sign = -1
+            num = ''
+        else:
+            num += n
+
+    res += int(num) * sign
+
+    return res
+
+
+if __name__ == "__main__":
+    exp = readline().strip()
+    print(solution(exp))
