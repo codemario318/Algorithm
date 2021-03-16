@@ -50,8 +50,10 @@ from itertools import combinations
 TOTAL = 9
 REAL = 7
 
+
 def readline():
     return int(stdin.readline())
+
 
 def solution(arr):
     for comb in combinations(arr, REAL):
@@ -59,11 +61,12 @@ def solution(arr):
         if sum(cand) == 100:
             return '\n'.join(map(str, cand))
 
+
 if __name__ == "__main__":
     dwarfs = [readline() for _ in range(TOTAL)]
     dwarfs.sort()
     print(solution(dwarfs))
 
-    
+
 
 
