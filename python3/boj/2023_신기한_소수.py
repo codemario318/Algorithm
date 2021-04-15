@@ -16,42 +16,39 @@
 N자리 수 중에서 신기한 소수를 오름차순으로 정렬해서 한 줄에 하나씩 출력한다.
 '''
 from math import sqrt
+from heapq import heappop, heappush
 
 
-def is_prime(primes, num):
-    try:
-        return primes[num]
-    except KeyError:
-        for n in range(2, int(sqrt(num)) + 1):
-            if not num % n:
-                primes[num] = False
-                break
-        else:
-            primes[num] = True
+def is_prime(num):
+    if num < 2:
+        return False
 
-        return primes[num]
+    for n in range(2, int(sqrt(num)) + 1):
+        if not num % n:
+            return False
+    return True
 
 
 if __name__ == '__main__':
     N = int(input())
 
     answer = []
-    primes = {0: False, 1: False}
 
-    s = 10 ** (N-1)
+    s = 10 ** (N - 1)
     e = 10 ** N
 
-    for n in range(s, e):
-        str_n = str(n)
-        lst = []
+    q = [2, 3, 5, 7]
 
-        for c in str_n:
-            lst.append(c)
-            num = int(''.join(lst))
+    while q:
+        n = heappop(q)
 
-            if not is_prime(primes, num):
-                break
-        else:
-            answer.append(str_n)
+        if s <= n < e:
+            print(n)
+            continue
 
-    print('\n'.join(answer))
+        n *= 10
+
+        for i in range(10):
+            num = n + i
+            if is_prime(num):
+                heappush(q, num)
