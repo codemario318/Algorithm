@@ -52,12 +52,17 @@ def search(field, M, N, x, y, visited):
 
         for wi, wj in OFFSET:
             ni, nj = i+wi, j+wj
+
             if 0 <= ni < M and 0 <= nj < N and not visited[ni][nj] and c == field[ni][nj]:
                 visited[ni][nj] = True
                 cnt += 1
                 q.append((ni, nj))
 
     return cnt
+
+
+def clac(prev, cur):
+    return prev + (cur**2)
 
 
 if __name__ == '__main__':
@@ -72,6 +77,7 @@ if __name__ == '__main__':
         for j in range(N):
             if visited[i][j]:
                 continue
+
             temp = search(feild, M, N, i, j, visited)
 
             if feild[i][j] == 'W':
@@ -79,6 +85,7 @@ if __name__ == '__main__':
             else:
                 B.append(temp)
 
-    w = reduce(lambda prev, cur: prev + (cur**2), W, 0)
-    b = reduce(lambda prev, cur: prev + (cur**2), B, 0)
+    w = reduce(clac, W, 0)
+    b = reduce(clac, B, 0)
+
     print(w, b)
