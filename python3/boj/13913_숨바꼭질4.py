@@ -32,57 +32,64 @@
 12851번. 숨바꼭질 2
 13549번. 숨바꼭질 3
 '''
-from heapq import heappop, heappush
+from collections import deque
 
 POS_MIN = 0
 POS_MAX = 1000000
 
 
-def get_path(D, pos, start):
-    path = []
+def get_path(D, s, e):
+    path = deque()
+    pos = e
 
-    while D[pos][1] != start:
-        path.append(pos)
-        pos = D[pos][1]
-    path.append(pos)
-    path.append(start)
-    return path[::-1]
+    while D[pos] != s:
+        path.appendleft(pos)
+        pos = D[pos]
+
+    path.appendleft(pos)
+    path.appendleft(s)
+
+    return path
 
 
 def search(n, k):
-    D = [[float('inf'), 0] for _ in range(POS_MAX+1)]
-    hq = [(0, n)]
+    visited = [-1 for _ in range(POS_MAX+1)]
+    time = 0
 
-    while hq:
-        time, cur = heappop(hq)
+    q = deque([n, -1])
+
+    while True:
+        cur = q.popleft()
+        
+        if cur == -1:
+            time += 1
+            q.append(-1)
+            continue
 
         if cur == k:
-            path = get_path(D, cur, n)
+            path = get_path(visited, n, k)
             return time, path
 
-        if cur < POS_MAX and time < D[cur+1][0]:
-            D[cur+1][0] = time+1
-            D[cur+1][1] = cur
-            heappush(hq, (time+1, cur+1))
+        if cur < POS_MAX and visited[cur+1] == -1:
+            visited[cur+1] = cur
+            q.append(cur+1)
 
-        if cur > POS_MIN and time < D[cur-1][0]:
-            D[cur-1][0] = time+1
-            D[cur-1][1] = cur
-            heappush(hq, (time+1, cur-1))
+        if cur > POS_MIN and visited[cur-1] == -1:
+            visited[cur-1] = cur
+            q.append(cur-1)
 
-        if POS_MIN < cur*2 < POS_MAX and time < D[cur*2][0]:
-            D[cur*2][0] = time+1
-            D[cur*2][1] = cur
-            heappush(hq, (time+1, cur*2))
+        if cur*2 <= POS_MAX and visited[cur*2] == -1:
+            visited[cur*2] = cur
+            q.append(cur*2)
 
 
 if __name__ == '__main__':
-    n, k = map(int, input().split())
+    n, k = map(int, input().split(' '))
 
     if n >= k:
         print(n-k)
-        print(' '.join(map(str, range(n, k-1, -1))))
+        print(*range(n, k-1, -1))
     else:
         time, path = search(n, k)
         print(time)
-        print(' '.join(map(str, path)))
+        print(*path)
