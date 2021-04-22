@@ -110,61 +110,28 @@ Pi	10	20	10	20	15	40	200
 출처
 문제를 만든 사람: baekjoon
 '''
-# from sys import stdin
-
-# readline = stdin.readline
-
-
-# def dp(jobs, N):
-#     mem = [0 for _ in range(N+1)]
-
-#     for i, (time, pay) in enumerate(jobs):
-#         nxt = i + time
-
-#         if nxt <= N:
-#             mem[nxt] = max(mem[i]+pay, mem[nxt])
-
-#         mem[i+1] = max(mem[i], mem[i+1])
-
-#     return mem[-1]
-
-
-# def main():
-#     N = int(readline())
-#     jobs = [list(map(int, readline().split())) for _ in range(N)]
-
-#     print(dp(jobs, N))
-
-
-# if __name__ == '__main__':
-#     main()
-
 from sys import stdin
 
 readline = stdin.readline
 
+def dp(jobs, N):
+    mem = [0 for _ in range(N+1)]
 
-def dp(jobs, N, i, mem):
-    if i > N:
-        return 0
+    for i, (time, pay) in enumerate(jobs):
+        nxt = i + time
 
-    if mem[i]:
-        return mem[i]
+        if nxt <= N:
+            mem[nxt] = max(mem[i]+pay, mem[nxt])
 
-    time, pay = jobs[i]
+        mem[i+1] = max(mem[i], mem[i+1])
 
-    if i+time <= N+1:
-        mem[i] = max(dp(jobs, N, i+time, mem) + pay, dp(jobs, N, i+1, mem))
-
-    return mem[i]
+    return mem[-1]
 
 
 def main():
     N = int(readline())
     jobs = [list(map(int, readline().split())) for _ in range(N)]
-    mem = [0 for _ in range(N+1)]
-
-    print(dp(jobs, N, 0, mem))
+    print(dp(jobs, N))
 
 
 if __name__ == '__main__':
