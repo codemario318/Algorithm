@@ -47,7 +47,8 @@ from sys import stdin
 OFFSET = [(0, 1), (1, 0), (1, 1)]
 readline = stdin.readline
 
-def solution(n, m, board):    
+
+def solution(n, m, board):
     for i in range(n):
         for j in range(m):
             temp = 0
@@ -59,10 +60,12 @@ def solution(n, m, board):
 
     return board[-1][-1]
 
+
 def main():
     N, M = map(int, readline().split())
     board = [list(map(int, readline().split())) for _ in range(N)]
     print(solution(N, M, board))
+
 
 if __name__ == '__main__':
     main()
