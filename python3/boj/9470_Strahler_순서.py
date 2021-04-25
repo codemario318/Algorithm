@@ -44,6 +44,16 @@ Strahler 순서 출처다국어분류
 1 3
 출처
 
+1
+1 9 8
+1 3
+2 3
+4 6
+5 6
+3 9
+6 9
+7 8
+8 9
 
 ICPC > Regionals > North America > Greater New York Region > 2013 Greater New York Programming Contest C번
 
@@ -56,21 +66,49 @@ ACM-ICPC Live Archive
 from sys import stdin
 readline = stdin.readline
 
-def solution():
-    pass
+
+def solution(m, graph, starts):
+    strahlers = [1 for _ in range(m+1)]
+    visited = [False for _ in range(m+1)]
+    q = list(starts)
+
+    while q:
+        cur = q.pop(0)
+        strahler = strahlers[cur]
+
+        for nxt in graph[cur]:
+            if strahlers[nxt] < strahler:
+                strahlers[nxt] = strahler
+                visited[nxt] = False
+                q.append(nxt)
+            elif strahlers[nxt] == strahler:
+                if not visited[nxt]:
+                    strahlers[nxt] = strahler+1
+                    visited[nxt] = True
+                else:
+                    visited[nxt] = False
+                q.append(nxt)
+
+    return strahlers[m]
+
 
 def main():
     T = int(readline())
 
     for _ in range(T):
         K, M, P = map(int, readline().split())
-        graph = [[] for _ in range(M)]
+        graph = [[] for _ in range(M+1)]
+        starts = set([i for i in range(1, M+1)])
 
         for _ in range(P):
             s, e = map(int, readline().split())
             graph[s].append(e)
 
-    pass
+            if e in starts:
+                starts.remove(e)
+
+        print(K, solution(M, graph, starts))
+
 
 if __name__ == '__main__':
     main()
