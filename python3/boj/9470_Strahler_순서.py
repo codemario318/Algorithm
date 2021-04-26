@@ -55,6 +55,41 @@ Strahler 순서 출처다국어분류
 7 8
 8 9
 
+1
+2 20 19
+1 3
+2 3
+3 7
+4 6
+5 6
+6 7
+8 9
+7 9
+9 10
+11 13
+12 13
+13 14
+15 17
+16 17
+17 14
+14 10
+10 19
+18 19
+19 20
+
+// 4
+
+1
+1 6 8
+1 3
+1 4
+2 4
+2 5
+3 4
+3 6
+4 6
+5 6
+
 ICPC > Regionals > North America > Greater New York Region > 2013 Greater New York Programming Contest C번
 
 문제를 번역한 사람: baekjoon
@@ -67,29 +102,32 @@ from sys import stdin
 readline = stdin.readline
 
 
-def solution(m, graph, starts):
-    strahlers = [1 for _ in range(m+1)]
-    visited = [False for _ in range(m+1)]
+def solution(m, graph, starts, edge_cnt):
+    S = [0 for _ in range(m+1)]
+    vals = [0 for _ in range(m+1)]
+
+    for s in starts:
+        vals[s] = 1
+        S[s] = 1
+
     q = list(starts)
 
     while q:
         cur = q.pop(0)
-        strahler = strahlers[cur]
 
         for nxt in graph[cur]:
-            if strahlers[nxt] < strahler:
-                strahlers[nxt] = strahler
-                visited[nxt] = False
-                q.append(nxt)
-            elif strahlers[nxt] == strahler:
-                if not visited[nxt]:
-                    strahlers[nxt] = strahler+1
-                    visited[nxt] = True
-                else:
-                    visited[nxt] = False
+            edge_cnt[nxt] -= 1
+
+            if S[cur] > vals[nxt]:
+                vals[nxt] = S[cur]
+                S[nxt] = S[cur]
+            elif S[cur] == vals[nxt]:
+                S[nxt] = vals[nxt] + 1
+
+            if not edge_cnt[nxt]:
                 q.append(nxt)
 
-    return strahlers[m]
+    return S[m]
 
 
 def main():
@@ -99,15 +137,17 @@ def main():
         K, M, P = map(int, readline().split())
         graph = [[] for _ in range(M+1)]
         starts = set([i for i in range(1, M+1)])
+        edge_cnt = [0 for _ in range(M+1)]
 
         for _ in range(P):
             s, e = map(int, readline().split())
             graph[s].append(e)
+            edge_cnt[e] += 1
 
             if e in starts:
                 starts.remove(e)
 
-        print(K, solution(M, graph, starts))
+        print(K, solution(M, graph, starts, edge_cnt))
 
 
 if __name__ == '__main__':
