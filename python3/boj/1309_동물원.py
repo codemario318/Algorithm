@@ -25,9 +25,6 @@
 문제의 오타를 찾은 사람: joon8409
 문제를 만든 사람: xhark
 '''
-# def dp(zoo, i, j):
-
-#     pass
 
 N = int(input())
 zoo = [1, 3]
