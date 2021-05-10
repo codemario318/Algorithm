@@ -15,13 +15,32 @@
 출력
 각 테스트 케이스에 대해서, 히스토그램에서 가장 넓이가 큰 직사각형의 넓이를 출력한다.
 
-예제 입력 1 
+예제 입력 1
 7 2 1 4 5 1 3 3
 4 1000 1000 1000 1000
+5 9 8 7 6 5
+5 5 6 7 8 9
+5 0 0 0 1 0
+5 1 0 0 0 1
+14 3 2 1 3 2 1 1 0 2 1 1 0 1 2
 0
-예제 출력 1 
+예제 출력 1
+8
 8
 4000
+25
+25
+1
+1
+
+
+3 2 1 2
+1 0
+2 0 0
+3 0 0 0
+0
+
+
 출처
 Contest > University of Ulm Local Contest > University of Ulm Local Contest 2003 H번
 
@@ -36,26 +55,35 @@ Sphere Online Judge
 HDU Online Judge
 '''
 from sys import stdin
-from collections import deque
+
 readline = stdin.readline
 
-def solution(n, arr):
-    total, height = 0, 0
-    q = deque()
 
-    for h in arr:
-        if height == h:
-            total += h
-            q.append(h)
-        elif height > h:
+def solution(arr):
+    stack = []
+    max_area = 0
 
+    for i, h in enumerate(arr):
+        while stack and arr[stack[-1]] > h:
+            j = stack.pop()
 
+            height = arr[j]
+            width = i - j if stack else i
+
+            area = width * height
+
+            if max_area < area:
+                max_area = area
+
+        stack.append(i)
+    return max_area
 
 
 while True:
     n, *arr = map(int, readline().split())
-    
-    if not n and not arr:
+
+    if not n:
         break
-    
-    print(solution(n, arr))
+
+    arr.append(0)
+    print(solution(arr))
