@@ -30,7 +30,7 @@
 데이터를 추가한 사람: djm03178
 '''
 from sys import stdin
-from functools import reduce
+
 readline = stdin.readline
 
 N, M = map(int, readline().split())
@@ -38,8 +38,8 @@ nums = list(map(int, readline().split()))
 sums = [0]
 
 for n in nums:
-    sums.append(sums[-1]+n)
+    sums.append(sums[-1] + n)
 
 for _ in range(M):
     i, j = map(int, readline().split())
-    print(sums[j]-sums[i-1])
+    print(sums[j] - sums[i - 1])
