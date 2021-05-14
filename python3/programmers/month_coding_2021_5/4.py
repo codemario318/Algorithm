@@ -71,8 +71,9 @@ def change_p_val(tree, parant, values, sub_sum, u, w):
         values[u-1] = values[p-1]
         temp = values[u-1]
 
-        for c in tree[u]:
-            temp += sub_sum[c]
+        if u in tree:
+            for c in tree[u]:
+                temp += sub_sum[c]
 
         sub_sum[u] = temp
 
