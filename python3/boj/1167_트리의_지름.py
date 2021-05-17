@@ -27,6 +27,8 @@
 문제를 만든 사람: author5
 데이터를 추가한 사람: djm03178
 '''
+# 트리의 지름 특성 증명
+# https://www.quora.com/How-does-following-algorithm-for-finding-longest-path-in-tree-work
 from sys import stdin
 from collections import deque
 
