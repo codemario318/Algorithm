@@ -42,10 +42,43 @@ Contest > Waterloo's local Programming Contests > 27 September, 2008 C번
 HDU Online Judge
 '''
 from sys import stdin
+from collections import deque
+
 readline = stdin.readline
+
+
+def union(a, b):
+    x = find(a)
+    y = find(b)
+
+    if x != y:
+        social[y] = x
+        size[x] += size[y]
+
+
+def find(a):
+    if social[a] == a:
+        return a
+    social[a] = find(social[a])
+    return social[a]
+
 
 F = int(readline())
 
 for _ in range(F):
+    social = {}
+    size = {}
+
     for i in range(int(readline())):
         a, b = readline().split()
+
+        if a not in social:
+            social[a] = a
+            size[a] = 1
+
+        if b not in social:
+            social[b] = b
+            size[b] = 1
+
+        union(a, b)
+        print(size[find(a)])
