@@ -24,7 +24,47 @@
 빠진 조건을 찾은 사람: tjrwodnjs999
 '''
 from sys import stdin
+
 readline = stdin.readline
 
-V, E = map(int, readline().split())
 
+def find(v):
+    if parants[v] == v:
+        return v
+    parants[v] = find(parants[v])
+    return parants[v]
+
+
+def union(v1, v2):
+    v1, v2 = find(v1), find(v2)
+
+    if v1 < v2:
+        parants[v2] = v1
+    else:
+        parants[v1] = v2
+
+
+V, E = map(int, readline().split())
+edges = []
+parants = [i for i in range(V + 1)]
+
+for _ in range(E):
+    A, B, C = map(int, readline().split())
+    edges.append((C, A, B))
+
+edges.sort(reverse=True)
+
+answer = 0
+count = 0
+
+while edges and count < V - 1:
+    c, a, b = edges.pop()
+
+    if find(a) == find(b):
+        continue
+    else:
+        union(a, b)
+        count += 1
+        answer += c
+
+print(answer)
