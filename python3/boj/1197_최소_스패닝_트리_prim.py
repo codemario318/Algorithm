@@ -19,52 +19,49 @@
 1 3 3
 예제 출력 1 
 3
+
+4 5
+2 4 5
+2 3 2
+1 3 3
+3 4 5
+1 2 1
+
+
 출처
 문제의 오타를 찾은 사람: BaaaaaaaaaaarkingDog
 빠진 조건을 찾은 사람: tjrwodnjs999
 '''
 from sys import stdin
+from heapq import heappop, heappush
 
 readline = stdin.readline
 
-
-def find(v):
-    if parants[v] == v:
-        return v
-    parants[v] = find(parants[v])
-    return parants[v]
-
-
-def union(v1, v2):
-    v1, v2 = find(v1), find(v2)
-
-    if v1 < v2:
-        parants[v2] = v1
-    else:
-        parants[v1] = v2
-
-
 V, E = map(int, readline().split())
-edges = []
-parants = [i for i in range(V + 1)]
+graph = [[] for _ in range(V + 1)]
+visited = set()
 
 for _ in range(E):
     A, B, C = map(int, readline().split())
-    edges.append((C, A, B))
+    heappush(graph[A], (C, B))
+    heappush(graph[B], (C, A))
 
-edges.sort(reverse=True)
+s = 1
+q = graph[1]
+t = 0
+visited.add(1)
 
-answer = 0
-count = 0
+while q and len(visited) < V:
+    c, e = heappop(q)
 
-while edges and count < V - 1:
-    c, a, b = edges.pop()
-
-    if find(a) == find(b):
+    if e in visited:
         continue
-    else:
-        union(a, b)
-        count += 1
-        answer += c
 
-print(answer)
+    visited.add(e)
+    t += c
+
+    for node in graph[e]:
+        if node[1] not in visited:
+            heappush(q, node)
+
+print(t)
