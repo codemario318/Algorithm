@@ -34,43 +34,62 @@
 잘못된 조건을 찾은 사람: WeissBlume
 '''
 from sys import stdin
+from math import sqrt, ceil
 
 readline = stdin.readline
 
 
-def update(tree, i, n):
-    while i <= N:
-        tree[i] += n
-        i += (i & -i)
+def init(node, start, end):
+    if start == end:
+        tree[node] = arr[start]
+    else:
+        tree[node] = init(node * 2, start, (start + end) // 2) + init(
+            node * 2 + 1, (start + end) // 2 + 1, end)
+    return tree[node]
 
 
-def prefix_sum(tree, i):
-    res = 0
-    while i > 0:
-        res += tree[i]
-        i -= (i & -i)
-    return res
+def interval_sum(node, start, end, left, right):
+    if left > end or right < start:
+        return 0
+
+    if left <= start and end <= right:
+        return tree[node]
+
+    return interval_sum(node * 2, start,
+                        (start + end) // 2, left, right) + interval_sum(
+                            node * 2 + 1,
+                            (start + end) // 2 + 1, end, left, right)
 
 
-def interval_sum(tree, s, e):
-    return prefix_sum(tree, e) - prefix_sum(tree, s - 1)
+def update(node, start, end, index, diff):
+    if index < start or index > end:
+        return
+
+    tree[node] += diff
+
+    if start != end:
+        update(node * 2, start, (start + end) // 2, index, diff)
+        update(node * 2, (start + end) // 2 + 1, end, index, diff)
 
 
 N, M, K = map(int, readline().split())
 
-arr = [0 for _ in range(N + 1)]
-tree = [0 for _ in range(N + 1)]
+# 세그먼트 트리 계산을 오류 없이 하기 위해 완전 이진 트리를 사용하며
+# 리프 노드의 개수가 N개인 완전 이진 트리에 필요한 노드 수는
+# 2**트리의 높이+1 이고 트리의 높이는 log2N 이다.
 
-for i in range(1, N + 1):
-    n = int(readline())
-    arr[i] = n
-    update(tree, i, n)
+h = ceil(sqrt(N))
+tree = [0 for _ in range(2**(h + 1))]
+arr = list(map(int, readline().split()))
+
+init(1, 0, N - 1)
 
 for _ in range(M + K):
     mode, a, b = map(int, readline().split())
 
     if mode == 1:
-        update(tree, a, b - arr[a])
+        diff = b - arr[a]
         arr[a] = b
+        update(1, 0, N - 1, a, diff)
     else:
         print(interval_sum(tree, a, b))
