@@ -80,9 +80,9 @@ N, M, K = map(int, readline().split())
 
 h = ceil(sqrt(N))
 tree = [0 for _ in range(2**(h + 1))]
-arr = list(map(int, readline().split()))
+arr = [0] + [int(readline()) for _ in range(N)]
 
-init(1, 0, N - 1)
+init(1, 1, N)
 
 for _ in range(M + K):
     mode, a, b = map(int, readline().split())
@@ -90,6 +90,6 @@ for _ in range(M + K):
     if mode == 1:
         diff = b - arr[a]
         arr[a] = b
-        update(1, 0, N - 1, a, diff)
+        update(1, 1, N, a, diff)
     else:
-        print(interval_sum(tree, a, b))
+        print(interval_sum(1, 1, N, a, b))
