@@ -35,10 +35,56 @@
 5 6
 6 4
 0 0
+
 예제 출력 1 
 Case 1: A forest of 3 trees.
 Case 2: There is one tree.
 Case 3: No trees.
+
+9 9
+1 2
+2 3
+3 4
+4 5
+3 5
+6 7
+7 8
+6 8
+8 9
+0 0
+
+Case 1: No trees.
+
+4 4
+2 3
+2 4
+3 4
+1 2
+0 0
+
+Case 1: No trees.
+
+4 4
+1 2
+2 3
+3 1
+4 1
+0 0
+
+Case 1: No trees.
+
+
+6 6
+1 2
+2 3
+4 5
+5 6
+4 6
+3 4
+
+Case 1: No trees.
+
+
 출처
 ICPC > Regionals > North America > Rocky Mountain Regional > 2012 Rocky Mountain Regional Contest H번
 
@@ -47,7 +93,33 @@ ICPC > Regionals > North America > Rocky Mountain Regional > 2012 Rocky Mountain
 데이터를 추가한 사람: jinhan814
 '''
 from sys import stdin
+from collections import deque
+
 readline = stdin.readline
+
+
+def bfs(s):
+    q = deque([(s, 0)])
+    visited[s] = True
+    while q:
+        cur, prev = q.popleft()
+
+        for nxt in graph[cur]:
+            if cur == nxt:
+                return False
+
+            if nxt == prev:
+                continue
+
+            if not visited[nxt]:
+                q.append((nxt, cur))
+                visited[nxt] = True
+            else:
+                return False
+    return True
+
+
+T = 1
 
 while True:
     N, M = map(int, readline().split())
@@ -55,4 +127,29 @@ while True:
     if not N and not M:
         break
 
-    
+    graph = [[] for _ in range(N + 1)]
+
+    for _ in range(M):
+        a, b = map(int, readline().split())
+        graph[a].append(b)
+        graph[b].append(a)
+
+    visited = [False for _ in range(N + 1)]
+    cnt = 0
+
+    for i in range(1, N + 1):
+        if visited[i]:
+            continue
+
+        if bfs(i):
+            cnt += 1
+        else:
+            print(f"Case {T}: No trees.")
+            break
+    else:
+        if cnt > 1:
+            print(f"Case {T}: A forest of {cnt} trees.")
+        else:
+            print(f"Case {T}: There is one tree.")
+
+    T += 1
