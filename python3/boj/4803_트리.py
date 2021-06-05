@@ -81,10 +81,44 @@ Case 1: No trees.
 5 6
 4 6
 3 4
+0 0
 
 Case 1: No trees.
 
+6 5
+1 2
+1 3
+4 5
+5 6
+6 4
+0 0
 
+Case 1: There is one tree.
+
+7 5
+1 2
+1 3
+4 5
+5 6
+6 4
+0 0
+
+Case 1: A forest of 2 trees.
+
+3 3
+1 2
+1 3
+2 3
+0 0
+
+Case 1: No trees.
+
+5 3
+1 2
+3 4
+5 5
+
+Case 1:
 출처
 ICPC > Regionals > North America > Rocky Mountain Regional > 2012 Rocky Mountain Regional Contest H번
 
@@ -95,19 +129,18 @@ ICPC > Regionals > North America > Rocky Mountain Regional > 2012 Rocky Mountain
 from sys import stdin
 from collections import deque
 
+MAX = 501
 readline = stdin.readline
 
 
-def bfs(s):
-    q = deque([(s, 0)])
+def bfs(s, graph, visited):
+    q = deque([(s, -1)])
     visited[s] = True
+
     while q:
         cur, prev = q.popleft()
 
         for nxt in graph[cur]:
-            if cur == nxt:
-                return False
-
             if nxt == prev:
                 continue
 
@@ -115,41 +148,51 @@ def bfs(s):
                 q.append((nxt, cur))
                 visited[nxt] = True
             else:
-                return False
-    return True
+                return 0
+    return 1
 
 
-T = 1
-
-while True:
-    N, M = map(int, readline().split())
-
-    if not N and not M:
-        break
-
-    graph = [[] for _ in range(N + 1)]
-
-    for _ in range(M):
-        a, b = map(int, readline().split())
-        graph[a].append(b)
-        graph[b].append(a)
-
-    visited = [False for _ in range(N + 1)]
+def count_tree(n, m):
+    graph = [[] for _ in range(n + 1)]
+    visited = [False for _ in range(n + 1)]
     cnt = 0
 
-    for i in range(1, N + 1):
-        if visited[i]:
-            continue
+    for _ in range(m):
+        a, b = map(int, readline().split())
 
-        if bfs(i):
-            cnt += 1
+        if a == b:
+            visited[a] = True
         else:
+            graph[a].append(b)
+            graph[b].append(a)
+
+    for i in range(1, n + 1):
+        if not visited[i]:
+            cnt += bfs(i, graph, visited)
+
+    return cnt
+
+
+def main():
+    T = 1
+
+    while True:
+        n, m = map(int, readline().split())
+
+        if not n:
+            return
+
+        res = count_tree(n, m)
+
+        if res == 0:
             print(f"Case {T}: No trees.")
-            break
-    else:
-        if cnt > 1:
-            print(f"Case {T}: A forest of {cnt} trees.")
-        else:
+        elif res == 1:
             print(f"Case {T}: There is one tree.")
+        else:
+            print(f"Case {T}: A forest of {res} trees.")
 
-    T += 1
+        T += 1
+
+
+if __name__ == "__main__":
+    main()
