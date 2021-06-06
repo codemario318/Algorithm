@@ -41,54 +41,72 @@
 예제 출력 2 
 0
 240
+
+4 2 1
+1
+3
+4
+5
+1 1 2
+2 1 3
+2 1 4
+
+24
+120
+
 출처
 문제의 오타를 찾은 사람: adh0463, nosiar, yj9404
 문제를 만든 사람: baekjoon
 빠진 조건을 찾은 사람: codenstory
 '''
 from sys import stdin
+from math import ceil, log2
 
 readline = stdin.readline
 
-RES_MAX = 1000000007
+MOD = 1000000007
 
 
-def update(idx, val):
-    while idx <= N:
-        tree[idx] = (tree[idx] * val) % RES_MAX
-        idx += (idx & -idx)
+def update(node, start, end, idx, val):
+    if end < idx or start > idx:
+        return tree[node]
+
+    if start == end:
+        tree[node] = val
+    else:
+        mid = (start + end) // 2
+        tree[node] = update(node * 2, start, mid, idx, val) % MOD
+        tree[node] *= update(node * 2 + 1, mid + 1, end, idx, val) % MOD
+        tree[node] %= MOD
+
+    return tree[node]
 
 
-def prefix_mul(idx):
-    res = 1
+def interval_mul(node, start, end, left, right):
+    if end < left or start > right:
+        return 1
 
-    while idx > 0:
-        res = (res * tree[idx]) % RES_MAX
-        idx -= (idx & -idx)
+    if start >= left and end <= right:
+        return tree[node]
 
-    return res
-
-
-def interval_mul(start, end):
-    return (prefix_mul(end) // prefix_mul(start-1)) % RES_MAX
+    mid = (start + end) // 2
+    res = interval_mul(node * 2, start, mid, left, right) % MOD
+    res *= interval_mul(node * 2 + 1, mid + 1, end, left, right) % MOD
+    return res % MOD
 
 
 N, M, K = map(int, readline().split())
-
-arr = [1] * (N + 1)
-tree = [1] * (N + 1)
+h = ceil(log2(N))
+tree = [0] * ((h + 1)**2)
 
 for i in range(1, N + 1):
     val = int(readline())
-    arr[i] = val
-    update(i, val)
+    update(1, 1, N, i, val)
 
 for _ in range(M + K):
-    mode, a, b = map(int, readline().split())
+    cmd, a, b = map(int, readline().split())
 
-    # if mode == 1:
-    #     update(a, b//a)
-    #     arr[a] = b
-    # else:
-    #     print(interval_mul(a, b))
-    
+    if cmd == 1:
+        update(1, 1, N, a, b)
+    else:
+        print(interval_mul(1, 1, N, a, b))
