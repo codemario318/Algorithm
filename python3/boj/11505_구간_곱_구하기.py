@@ -69,7 +69,7 @@ MOD = 1000000007
 
 def init(node, start, end):
     if start == end:
-        tree[start] = arr[start]
+        tree[node] = arr[start]
     else:
         mid = (start + end) // 2
         tree[node] = init(node * 2, start, mid) % MOD
