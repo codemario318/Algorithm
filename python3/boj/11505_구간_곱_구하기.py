@@ -67,16 +67,27 @@ readline = stdin.readline
 MOD = 1000000007
 
 
-def update(node, start, end, idx, val):
-    if end < idx or start > idx:
+def init(node, start, end):
+    if start == end:
+        tree[start] = arr[start]
+    else:
+        mid = (start + end) // 2
+        tree[node] = init(node * 2, start, mid) % MOD
+        tree[node] *= init(node * 2 + 1, mid + 1, end) % MOD
+        tree[node] %= MOD
+    return tree[node]
+
+
+def update(node, start, end, target, val):
+    if end < target or start > target:
         return tree[node]
 
     if start == end:
         tree[node] = val
     else:
         mid = (start + end) // 2
-        tree[node] = update(node * 2, start, mid, idx, val) % MOD
-        tree[node] *= update(node * 2 + 1, mid + 1, end, idx, val) % MOD
+        tree[node] = update(node * 2, start, mid, target, val) % MOD
+        tree[node] *= update(node * 2 + 1, mid + 1, end, target, val) % MOD
         tree[node] %= MOD
 
     return tree[node]
@@ -96,17 +107,18 @@ def interval_mul(node, start, end, left, right):
 
 
 N, M, K = map(int, readline().split())
-h = ceil(log2(N))
-tree = [0] * ((h + 1)**2)
+arr = [0] + [int(readline()) for _ in range(N)]
+h = int(ceil(log2(N)))
+size = 2**(h + 1)
+tree = [0] * size
 
-for i in range(1, N + 1):
-    val = int(readline())
-    update(1, 1, N, i, val)
+init(1, 1, N)
 
 for _ in range(M + K):
     cmd, a, b = map(int, readline().split())
 
     if cmd == 1:
+        arr[a] = b
         update(1, 1, N, a, b)
     else:
         print(interval_mul(1, 1, N, a, b))
