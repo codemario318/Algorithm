@@ -33,63 +33,108 @@
 데이터를 추가한 사람: klm03025
 잘못된 조건을 찾은 사람: WeissBlume
 '''
+# from sys import stdin
+# from math import sqrt, ceil
+
+# readline = stdin.readline
+
+# def init(node, start, end):
+#     if start == end:
+#         tree[node] = arr[start]
+#     else:
+#         tree[node] = init(node * 2, start, (start + end) // 2) + init(
+#             node * 2 + 1, (start + end) // 2 + 1, end)
+#     return tree[node]
+
+# def interval_sum(node, start, end, left, right):
+#     if left > end or right < start:
+#         return 0
+
+#     if left <= start and end <= right:
+#         return tree[node]
+
+#     return interval_sum(node * 2, start,
+#                         (start + end) // 2, left, right) + interval_sum(
+#                             node * 2 + 1,
+#                             (start + end) // 2 + 1, end, left, right)
+
+# def update(node, start, end, index, diff):
+#     if index < start or index > end:
+#         return
+
+#     tree[node] += diff
+
+#     if start != end:
+#         update(node * 2, start, (start + end) // 2, index, diff)
+#         update(node * 2, (start + end) // 2 + 1, end, index, diff)
+
+# N, M, K = map(int, readline().split())
+
+# # 세그먼트 트리 계산을 오류 없이 하기 위해 완전 이진 트리를 사용하며
+# # 리프 노드의 개수가 N개인 완전 이진 트리에 필요한 노드 수는
+# # 2**트리의 높이+1 이고 트리의 높이는 log2N 이다.
+
+# h = ceil(sqrt(N))
+# tree = [0 for _ in range(2**(h + 1))]
+# arr = [0] + [int(readline()) for _ in range(N)]
+
+# init(1, 1, N)
+
+# for _ in range(M + K):
+#     mode, a, b = map(int, readline().split())
+
+#     if mode == 1:
+#         diff = b - arr[a]
+#         arr[a] = b
+#         update(1, 1, N, a, diff)
+#     else:
+#         print(interval_sum(1, 1, N, a, b))
+
 from sys import stdin
-from math import sqrt, ceil
 
 readline = stdin.readline
 
 
-def init(node, start, end):
-    if start == end:
-        tree[node] = arr[start]
-    else:
-        tree[node] = init(node * 2, start, (start + end) // 2) + init(
-            node * 2 + 1, (start + end) // 2 + 1, end)
-    return tree[node]
+def update(i, val):
+    i += N
+    tree[i] = val
+    while i > 1:
+        i //= 2
+        tree[i] = tree[2 * i] + tree[2 * i + 1]
 
 
-def interval_sum(node, start, end, left, right):
-    if left > end or right < start:
-        return 0
+def query(l, r):
+    res = 0
+    l += N
+    r += N
 
-    if left <= start and end <= right:
-        return tree[node]
+    while l < r:
+        if l & 1:
+            res += tree[l]
+            l += 1
+        if r & 1:
+            r -= 1
+            res += tree[r]
+        l //= 2
+        r //= 2
 
-    return interval_sum(node * 2, start,
-                        (start + end) // 2, left, right) + interval_sum(
-                            node * 2 + 1,
-                            (start + end) // 2 + 1, end, left, right)
-
-
-def update(node, start, end, index, diff):
-    if index < start or index > end:
-        return
-
-    tree[node] += diff
-
-    if start != end:
-        update(node * 2, start, (start + end) // 2, index, diff)
-        update(node * 2, (start + end) // 2 + 1, end, index, diff)
+    return res
 
 
 N, M, K = map(int, readline().split())
 
-# 세그먼트 트리 계산을 오류 없이 하기 위해 완전 이진 트리를 사용하며
-# 리프 노드의 개수가 N개인 완전 이진 트리에 필요한 노드 수는
-# 2**트리의 높이+1 이고 트리의 높이는 log2N 이다.
+tree = [0] * N
 
-h = ceil(sqrt(N))
-tree = [0 for _ in range(2**(h + 1))]
-arr = [0] + [int(readline()) for _ in range(N)]
+for i in range(N, 2 * N):
+    num = int(readline())
+    tree.append(num)
 
-init(1, 1, N)
+for i in range(N - 1, 0, -1):
+    tree[i] = tree[2 * i] + tree[2 * i + 1]
 
 for _ in range(M + K):
-    mode, a, b = map(int, readline().split())
-
-    if mode == 1:
-        diff = b - arr[a]
-        arr[a] = b
-        update(1, 1, N, a, diff)
+    cmd, a, b = map(int, readline().split())
+    if cmd == 1:
+        update(a - 1, b)
     else:
-        print(interval_sum(1, 1, N, a, b))
+        print(query(a - 1, b))
