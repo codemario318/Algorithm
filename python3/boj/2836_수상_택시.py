@@ -37,7 +37,30 @@ Olympiad > Croatian Highschool Competitions in Informatics > 2011 > Croatian Oly
 문제의 오타를 찾은 사람: jake0713, kks227
 '''
 from sys import stdin
+
 readline = stdin.readline
 
 N, M = map(int, readline().split())
-arr = list(map(int, readline().split()))
+arr = []
+
+for _ in range(N):
+    s, e = map(int, readline().split())
+    if s > e:
+        arr.append((e, s))
+
+arr.sort()
+
+dist = M
+left, right = 0, 0
+
+for e, s in arr:
+    if e <= right:
+        right = max(s, right)
+    else:
+        dist += 2 * (right - left)
+        left = e
+        right = s
+else:
+    dist += 2 * (right - left)
+
+print(dist)
