@@ -48,20 +48,19 @@ ICPC > Regionals > Latin America > Latin America Regional Contests 2012 C번
 문제를 번역한 사람: kks227
 '''
 from sys import stdin
-from collections import deque
 
-readlines = stdin.readlines
+readline = stdin.readline
 
 
 def init(root, word):
     trie = root
 
     for c in word:
-        if c not in trie['children']:
-            trie['children'][c] = {'last': False, 'children': {}}
-        trie = trie['children'][c]
+        if c not in trie:
+            trie[c] = {}
+        trie = trie[c]
 
-    trie['last'] = True
+    trie['!'] = True
 
 
 def button_count(root, word):
@@ -69,26 +68,26 @@ def button_count(root, word):
     count = 0
 
     for c in word:
-        if len(trie['children']) > 1 or trie['last']:
+        if len(trie) > 1:
             count += 1
-        trie = trie['children'][c]
+        trie = trie[c]
     return count
 
 
-lines = deque(readlines())
+while True:
+    try:
+        N = int(readline())
+    except ValueError:
+        break
 
-while lines:
-    N = int(lines.popleft())
-    trie = {'children': {}, 'last': True}
-    words = []
+    trie = {'!': True}
+    words = [readline().rstrip() for _ in range(N)]
     total = 0
 
-    for _ in range(N):
-        word = lines.popleft().rstrip()
-        words.append(word)
+    for word in words:
         init(trie, word)
 
     for word in words:
         total += button_count(trie, word)
 
-    print(f'{total/len(words):.2f}')
+    print(f'{total/N:.2f}')
