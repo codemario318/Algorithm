@@ -48,79 +48,47 @@ ICPC > Regionals > Latin America > Latin America Regional Contests 2012 C번
 문제를 번역한 사람: kks227
 '''
 from sys import stdin
-readline = stdin.readline
+from collections import deque
 
-def init(trie, word, d):
-    if d >= len(word):
-        return
-
-    c = word[d]
-
-    if c not in trie:
-        trie[c] = {}
-
-    init(trie[c], word, d+1)
+readlines = stdin.readlines
 
 
-def button_count(trie, word, d):
-    if not trie:
-        return 0
+def init(root, word):
+    trie = root
 
-    c = word[d]
+    for c in word:
+        if c not in trie['children']:
+            trie['children'][c] = {'last': False, 'children': {}}
+        trie = trie['children'][c]
 
-    if len(trie) == 1:
-        return button_count(trie[c], word, d+1)
+    trie['last'] = True
 
-    return button_count(trie[c], word, d+1) + 1
 
-while True:
-    N = int(readline())
-    trie = {}
+def button_count(root, word):
+    trie = root
+    count = 0
+
+    for c in word:
+        if len(trie['children']) > 1 or trie['last']:
+            count += 1
+        trie = trie['children'][c]
+    return count
+
+
+lines = deque(readlines())
+
+while lines:
+    N = int(lines.popleft())
+    trie = {'children': {}, 'last': True}
     words = []
     total = 0
 
     for _ in range(N):
-        word = readline().strip()
+        word = lines.popleft().rstrip()
         words.append(word)
-        init(trie, word, 0)
+        init(trie, word)
 
     for word in words:
-        c = word[0]
-        total += 1 + button_count(trie[c], word, 1)
+        total += button_count(trie, word)
 
     print(f'{total/len(words):.2f}')
-
-    {
-        'h': {
-            'e': {
-                
-                'l': {
-                    'l': {
-                        'o': {}
-                    }
-                },
-                
-                'a': {
-                    'v': {
-                        'e': {
-                            'n': {}
-                        }
-                    }
-                }
-            }
-        },
-
-        'g': {
-            'o': {
-                'o': {
-                    'd': {
-                        'b': {
-                            'y': {
-                                'e': {}
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
