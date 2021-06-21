@@ -23,25 +23,40 @@ N개의 수로 이루어진 수열 A[1], A[2], …, A[N]이 있다. 이 수열�
 데이터를 추가한 사람: akaishuichi
 '''
 from sys import stdin
+
 readline = stdin.readline
 
-def update(tree, idx, val):
-    pass
 
-def interval_sum(tree, start, end):
-    pass
+def update(tree, idx):
+    global N
+    while idx <= N:
+        tree[idx] += 1
+        idx += (idx & -idx)
+
+
+def interval_sum(tree, idx):
+    res = 0
+
+    while idx > 0:
+        res += tree[idx]
+        idx -= (idx & -idx)
+
+    return res
 
 
 def main():
+    global N
     N = int(readline())
-    arr = sorted(enumerate(map(int, readline().split())), key=lambda x: (x[1], x[0]))
+    arr = sorted(enumerate(map(int, readline().split()), 1), key=lambda x: (x[1], x[0]), reverse=True)
     tree = [0] * (N + 1)
     res = 0
 
-    for num, _ in arr:
-        res += interval_sum(tree, num, N)
-        update(tree, num, 1)
-    
+    for idx, _ in arr:
+        res += interval_sum(tree, idx-1)
+        update(tree, idx)
+
+    print(res)
+
 
 if __name__ == '__main__':
     main()
