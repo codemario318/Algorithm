@@ -59,6 +59,24 @@ NO
 NO
 YES
 NO
+
+1
+5 10
+1 0 1
+1 0 2
+1 0 3
+1 0 4
+1 1 2
+1 1 3
+1 1 4
+1 2 3
+1 2 4
+1 3 4
+
+1
+4 2
+0 0 1
+0 2 3
 출처
 ICPC > Regionals > Asia Pacific > Thailand > Asia Thailand National Programming Contest > 2013 ACM-ICPC Thailand National Programming Contest  G번
 
@@ -67,18 +85,80 @@ ICPC > Regionals > Asia Pacific > Thailand > Asia Thailand National Programming 
 문제를 번역한 사람: kesakiyo
 '''
 from sys import stdin
+
 readline = stdin.readline
 
+
 def init_tree(N):
-    pass
+    min_tree = [float('inf') for _ in range(N)] + [i for i in range(N)]
+    max_tree = [-1 for _ in range(N)] + [i for i in range(N)]
+
+    for i in range(N - 1, 0, -1):
+        min_tree[i] = min(min_tree[2 * i], min_tree[2 * i + 1])
+        max_tree[i] = max(max_tree[2 * i], max_tree[2 * i + 1])
+
+    return min_tree, max_tree
 
 
-def update_tree(idx, val):
-    pass
+def update_tree(min_tree, max_tree, idx):
+    while idx > 1:
+        idx //= 2
+        min_tree[idx] = min(min_tree[2 * idx], min_tree[2 * idx + 1])
+        max_tree[idx] = max(max_tree[2 * idx], max_tree[2 * idx + 1])
 
 
-def dvd(N, K):
-    pass
+def change_video(min_tree, max_tree, n, a, b):
+    a += n
+    b += n
+
+    min_tree[a], min_tree[b] = min_tree[b], min_tree[a]
+    max_tree[a], max_tree[b] = max_tree[b], max_tree[a]
+
+    update_tree(min_tree, max_tree, a)
+    update_tree(min_tree, max_tree, b)
+
+
+def get_interval_min_max(min_tree, max_tree, n, l, r):
+    l += n
+    r += n
+
+    min_val, max_val = float('inf'), -1
+
+    while l < r:
+        if l & 1:
+            if min_tree[l] < min_val:
+                min_val = min_tree[l]
+            if max_tree[l] > max_val:
+                max_val = max_tree[l]
+            l += 1
+
+        if r & 1:
+            r -= 1
+            if min_tree[r] < min_val:
+                min_val = min_tree[r]
+            if max_tree[r] > max_val:
+                max_val = max_tree[r]
+
+        l //= 2
+        r //= 2
+
+    return min_val, max_val
+
+
+def is_seq(min_tree, max_tree, n, a, b):
+    min_val, max_val = get_interval_min_max(min_tree, max_tree, n, a, b + 1)
+    return min_val == a and max_val == b
+
+
+def dvd(n, k):
+    min_tree, max_tree = init_tree(n)
+
+    for _ in range(k):
+        cmd, a, b = map(int, readline().split())
+        if cmd == 0:
+            change_video(min_tree, max_tree, n, a, b)
+        else:
+            print('YES' if is_seq(min_tree, max_tree, n, a, b) else 'NO')
 
 
 def main():
@@ -87,6 +167,7 @@ def main():
     for _ in range(T):
         N, K = map(int, readline().split())
         dvd(N, K)
+
 
 if __name__ == '__main__':
     main()
