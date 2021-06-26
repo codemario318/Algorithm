@@ -37,38 +37,54 @@ ICPC > Regionals > Asia Pacific > Korea > Asia Regional - Daejeon 2013 L번
 문제를 번역한 사람: plzrun
 데이터를 추가한 사람: qwe123rt45
 '''
-from sys import stdin
-from collections import deque
+from sys import stdin, setrecursionlimit
 
+setrecursionlimit(100001)
 readline = stdin.readline
 
-def dfs(cur, start, votes, visited):
-    if cur == start:
-        return True
+
+def dfs(cur, visited, group):
+    global votes
+    visited[cur] = True
 
     nxt = votes[cur]
+    count = 0
 
-    if nxt in visited:
-        return False
+    if not visited[nxt]:
+        count = dfs(nxt, visited, group)
+    elif not group[nxt]:
+        count += 1
 
-    visited.add(nxt)
-    return dfs(nxt, start, votes, visited)
-    
+        while nxt != cur:
+            count += 1
+            nxt = votes[nxt]
 
-def turm_project(n, votes):
-    solo = 0
-    for i in range(1, n+1):
-        vote = votes[i]
-        if not dfs(vote, i, votes, set()):
-           solo += 1
+    group[cur] = True
+
+    return count
+
+
+def turm_project(n):
+    visited = [False for _ in range(n + 1)]
+    group = [False for _ in range(n + 1)]
+    solo = n
+
+    for i in range(1, n + 1):
+        if not visited[i]:
+            solo -= dfs(i, visited, group)
     return solo
 
+
 def main():
+    global votes
+
     T = int(readline())
+
     for _ in range(T):
         N = int(readline())
         votes = [0] + list(map(int, readline().split()))
-        print(turm_project(N, votes))
+        print(turm_project(N))
+
 
 if __name__ == '__main__':
     main()
