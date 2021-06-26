@@ -39,7 +39,7 @@ ICPC > Regionals > Asia Pacific > Korea > Asia Regional - Daejeon 2013 L번
 '''
 from sys import stdin, setrecursionlimit
 
-setrecursionlimit(100001)
+setrecursionlimit(1000000)
 readline = stdin.readline
 
 
