@@ -35,30 +35,20 @@ ICPC > Regionals > Asia Pacific > Japan > Asia Regional Contest 2005 in Tokyo A�
 문제의 오타를 찾은 사람: d252b
 데이터를 추가한 사람: thesulks
 '''
-from math import sqrt
 
 
 def get_primes(n):
-    primes = [n for n in range(2, int(sqrt(n) + 1)) if is_prime(n)]
+    sieve = [False for _ in range(n + 1)]
 
-    sieve = [True for _ in range(n + 1)]
-    sieve[0] = False
-    sieve[1] = False
+    for i in range(2, n + 1):
+        if i**2 > n:
+            break
 
-    for prime in primes:
-        for i in range(prime * 2, n + 1, prime):
-            sieve[i] = False
+        if not sieve[i]:
+            for j in range(i**2, n + 1, i):
+                sieve[j] = True
 
-    return [i for i in range(n + 1) if sieve[i]]
-
-
-def is_prime(n):
-    if n <= 1:
-        return False
-    for i in range(2, int(sqrt(n)) + 1):
-        if not n % i:
-            return False
-    return True
+    return [i for i in range(2, n + 1) if not sieve[i]]
 
 
 def prime_seq_sum(n, primes):
@@ -66,22 +56,17 @@ def prime_seq_sum(n, primes):
     total = 0
     left, right = 0, 0
 
-    while right < len(primes) - 1:
+    while True:
         if total < n:
-            right += 1
+            if right == len(primes):
+                break
             total += primes[right]
+            right += 1
         else:
             total -= primes[left]
             left += 1
 
         if total == n:
-            count += 1
-
-    while n < total:
-        total -= primes[left]
-        left += 1
-
-        if n == total:
             count += 1
 
     return count
