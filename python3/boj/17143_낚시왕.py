@@ -45,36 +45,6 @@
 2 2 2 3 5
 예제 출력 1 
 22
-각 칸의 왼쪽 아래에 적힌 수는 속력, 오른쪽 아래는 크기, 왼쪽 위는 상어를 구분하기 위한 문자이다. 오른쪽 위에 ❤️는 낚시왕이 잡은 물고기 표시이다.
-
-
-
-초기 상태
-
-
-
-1초
-
-
-
-2초 (E번 상어는 B번에게 먹혔다)
-
-
-
-3초
-
-
-
-4초
-
-
-
-5초
-
-
-
-6초
-
 예제 입력 2 
 100 100 0
 예제 출력 2 
@@ -95,8 +65,91 @@
 2 1 2 1 4
 예제 출력 4 
 4
+
+4 4 4
+1 1 6 1 1
+2 2 6 2 1
+3 3 6 3 1
+4 4 6 4 1
+
+4
+
+4 4 4
+1 4 6 1 1
+2 4 6 3 1
+3 4 6 3 1
+4 4 6 2 1
+
+4
+
+3 3 3
+1 3 9 1 1
+2 3 9 3 2
+3 3 9 4 3
+
+4
+
 출처
 문제를 만든 사람: baekjoon
 데이터를 추가한 사람: djm03178
 문제의 오타를 찾은 사람: hellojdh
 '''
+from sys import stdin
+
+readline = stdin.readline
+
+OFFSET = [None, (-1, 0), (1, 0), (0, 1), (0, -1)]
+CHANGE = [None, 2, 1, 4, 3]
+
+
+def move(r, c, s, d):
+    rs = s % (R - 1) * 2
+    cs = s % (C - 1) * 2
+
+    ns =  rs if d < 3 else cs
+    wr, wc = OFFSET[d]
+    
+    for _ in range(ns):
+        if (d == 1 and r == 1) or (d == 2  and r == R) or (d == 3 and c == C) or (d == 4 and c == 1):
+            d = CHANGE[d]
+            wr, wc = OFFSET[d]
+        r += wr
+        c += wc
+            
+    return r, c, d
+
+
+R, C, M = map(int, readline().split())
+board = [[-1 for _ in range(C + 1)] for _ in range(R + 1)]
+total = 0
+
+for _ in range(M):
+    r, c, *info = map(int, readline().split())
+    board[r][c] = info
+
+for f in range(1, C + 1):
+    for i in range(1, R + 1):
+        if board[i][f] != -1:
+            total += board[i][f][-1]
+            board[i][f] = -1
+
+    for r in range(1, R + 1):
+        if i == r:
+            continue
+
+
+        for c in range(1, C + 1):
+            if board[r][c] == -1:
+                continue
+            s, d, z = board[r][c]
+            nr, nc, board[r][c][1] = move(r, c, s, d)
+
+
+            if board[nr][nc] == -1 or board[nr][nc][-1] < z:
+                board[nr][nc] = board[r][c]
+
+            if (r, c) != (nr, nc):
+                board[r][c] = -1
+
+
+print(total)
