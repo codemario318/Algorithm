@@ -68,17 +68,17 @@
 
 4 4 4
 1 1 6 1 1
-2 2 6 2 1
-3 3 6 3 1
-4 4 6 4 1
+2 2 6 2 2
+3 3 6 3 3
+4 4 6 4 4
 
 4
 
 4 4 4
 1 4 6 1 1
-2 4 6 3 1
-3 4 6 3 1
-4 4 6 2 1
+2 4 6 3 2
+3 4 6 3 3
+4 4 6 2 4
 
 4
 
@@ -89,6 +89,67 @@
 
 4
 
+4 4 4
+1 1 1 2 10
+2 1 0 1 1
+3 1 1 2 10
+4 1 0 1 1
+
+
+100 7 7
+3 2 2 3 9
+3 3 1 3 3
+3 5 1 4 7
+3 6 2 4 6
+2 4 1 2 8
+1 4 2 2 4
+4 4 1 1 5
+
+18
+
+
+in:
+10 10 2
+1 9 8 2 1
+5 10 7 4 2
+
+out:
+0
+
+in:
+4 2 2
+2 2 3 1 1
+4 2 3 1 2
+
+out:
+2
+
+in:
+2 5 1
+1 5 1 3 1
+
+out:
+1
+
+
+100 7 7
+3 2 2 3 9
+3 3 1 3 3
+3 5 1 4 7
+3 6 2 4 6
+2 4 1 2 8
+1 4 2 2 4
+4 4 1 1 5
+   
+correct answer = 0;
+
+
+in:
+5 5 1
+1 4 10 3 1
+
+out:
+0
 출처
 문제를 만든 사람: baekjoon
 데이터를 추가한 사람: djm03178
@@ -102,54 +163,72 @@ OFFSET = [None, (-1, 0), (1, 0), (0, 1), (0, -1)]
 CHANGE = [None, 2, 1, 4, 3]
 
 
+def fishing(sharks):
+    total = 0
+
+    for j in range(R):
+        if j in sharks[fc]:
+            total += sharks[fc].pop(j)[-1]
+            break
+
+    return total
+
+
+def new_sharks(sharks):
+    temp = [{} for _ in range(C)]
+
+    for c in range(C):
+        for r, (s, d, z) in sharks[c].items():
+            nr, nc, sharks[c][r][1] = move(r, c, s, d)
+
+            if nr not in temp[nc] or temp[nc][nr][-1] < z:
+                temp[nc][nr] = sharks[c][r]
+
+    return temp
+
+
 def move(r, c, s, d):
     rs = s % (R - 1) * 2
     cs = s % (C - 1) * 2
 
-    ns =  rs if d < 3 else cs
+    ns = rs if d > 2 else cs
     wr, wc = OFFSET[d]
-    
+
     for _ in range(ns):
-        if (d == 1 and r == 1) or (d == 2  and r == R) or (d == 3 and c == C) or (d == 4 and c == 1):
+        if (d == 1 and r == 0) or (d == 2 and r == R - 1) or (
+                d == 3 and c == C - 1) or (d == 4 and c == 0):
             d = CHANGE[d]
             wr, wc = OFFSET[d]
         r += wr
         c += wc
-            
+
     return r, c, d
 
 
 R, C, M = map(int, readline().split())
-board = [[-1 for _ in range(C + 1)] for _ in range(R + 1)]
+sharks = [{} for _ in range(C)]
 total = 0
 
 for _ in range(M):
     r, c, *info = map(int, readline().split())
-    board[r][c] = info
+    sharks[c - 1][r - 1] = info
 
-for f in range(1, C + 1):
-    for i in range(1, R + 1):
-        if board[i][f] != -1:
-            total += board[i][f][-1]
-            board[i][f] = -1
+print('init')
+for shark in sharks:
+    print(shark)
 
-    for r in range(1, R + 1):
-        if i == r:
-            continue
+for fc in range(C):
+    if sharks[fc]:
+        total += fishing(sharks)
+    
+    print('fishing')
+    for shark in sharks:
+        print(shark)
 
-
-        for c in range(1, C + 1):
-            if board[r][c] == -1:
-                continue
-            s, d, z = board[r][c]
-            nr, nc, board[r][c][1] = move(r, c, s, d)
-
-
-            if board[nr][nc] == -1 or board[nr][nc][-1] < z:
-                board[nr][nc] = board[r][c]
-
-            if (r, c) != (nr, nc):
-                board[r][c] = -1
-
+    sharks = new_sharks(sharks)
+    
+    print('MOVE')
+    for shark in sharks:
+        print(shark)
 
 print(total)
