@@ -30,33 +30,74 @@ M개의 줄에 차례대로 입력받은 두 노드 사이의 거리를 출력�
 13
 3
 36
+
+7
+1 6 13
+6 3 9
+3 5 7
+4 1 3
+2 4 20
+4 7 2
+1
+2 7
+
+22
 출처
 문제를 번역한 사람: author6
 문제의 오타를 찾은 사람: justin0907, wjsqjawns
 빠진 조건을 찾은 사람: ntopia
 '''
+# LCA 최소 공통 조상
 from sys import stdin
-from heapq import heappop, heappush
+from collections import deque
 
 readline = stdin.readline
+ROOT = 1
 
 
-def search(tree, a, b):
-    D = [float('inf') for _ in range(len(tree))]
-    hq = [(0, a)]
+def search(tree):
+    parant = [-1 for _ in range(len(tree))]
+    depth = [len(tree) for _ in range(len(tree))]
+    q = deque([ROOT])
 
-    D[a] = 0
+    parant[ROOT] = 0
+    depth[ROOT] = 0
 
-    while hq:
-        total, cur = heappop(hq)
+    while q:
+        cur = q.popleft()
 
-        if cur == b:
-            return total
+        for child in tree[cur]:
+            if parant[child] == -1:
+                parant[child] = cur
+                depth[child] = depth[cur] + 1
+                q.append((child))
 
-        for nxt, cost in tree[cur].items():
-            if D[nxt] > total + cost:
-                D[nxt] = total + cost
-                heappush(hq, (D[nxt], nxt))
+    return parant, depth
+
+
+def leveling(tree, parant, depth, a, b):
+    total = 0
+
+    while depth[a] > depth[b]:
+        total += tree[a][parant[a]]
+        a = parant[a]
+
+    while depth[b] > depth[a]:
+        total += tree[b][parant[b]]
+        b = parant[b]
+
+    return total, a, b
+
+
+def lca(tree, parant, a, b):
+    total = 0
+
+    while a != b:
+        total += tree[a][parant[a]] + tree[b][parant[b]]
+        a = parant[a]
+        b = parant[b]
+
+    return total
 
 
 def main():
@@ -69,10 +110,13 @@ def main():
         tree[e][s] = c
 
     M = int(readline())
+    parant, depth = search(tree)
 
     for _ in range(M):
-        s, e = map(int, readline().split())
-        print(search(tree, s, e))
+        a, b = map(int, readline().split())
+        res, a, b = leveling(tree, parant, depth, a, b)
+        res += lca(tree, parant, a, b)
+        print(res)
 
 
 if __name__ == '__main__':
