@@ -48,6 +48,7 @@ M개의 줄에 차례대로 입력받은 두 노드 사이의 거리를 출력�
 빠진 조건을 찾은 사람: ntopia
 '''
 # LCA 최소 공통 조상
+# https://2step-hyun.tistory.com/52
 from sys import stdin
 from collections import deque
 
@@ -56,48 +57,39 @@ ROOT = 1
 
 
 def search(tree):
-    parant = [-1 for _ in range(len(tree))]
-    depth = [len(tree) for _ in range(len(tree))]
+    parant = [[] for _ in range(len(tree))]
+    dist = [-1 for _ in range(len(tree))]
     q = deque([ROOT])
 
-    parant[ROOT] = 0
-    depth[ROOT] = 0
+    dist[ROOT] = 0
 
     while q:
         cur = q.popleft()
 
-        for child in tree[cur]:
-            if parant[child] == -1:
-                parant[child] = cur
-                depth[child] = depth[cur] + 1
-                q.append((child))
+        for child, cost in tree[cur].items():
+            if dist[child] == -1:
+                parant[child] = [cur] + parant[cur]
+                dist[child] = dist[cur] + cost
+                q.append(child)
 
-    return parant, depth
-
-
-def leveling(tree, parant, depth, a, b):
-    total = 0
-
-    while depth[a] > depth[b]:
-        total += tree[a][parant[a]]
-        a = parant[a]
-
-    while depth[b] > depth[a]:
-        total += tree[b][parant[b]]
-        b = parant[b]
-
-    return total, a, b
+    return parant, dist
 
 
-def lca(tree, parant, a, b):
-    total = 0
+def lca(parant, a, b):
+    if a == ROOT or b == ROOT:
+        return ROOT
 
-    while a != b:
-        total += tree[a][parant[a]] + tree[b][parant[b]]
-        a = parant[a]
-        b = parant[b]
+    if len(parant[a]) < len(parant[b]):
+        a, b = b, a
 
-    return total
+    diff = len(parant[a]) - len(parant[b])
+    a = parant[a][diff]
+
+    for i in range(len(parant[a])):
+        if parant[a][i] == parant[b][i]:
+            return parant[a][i]
+
+    return ROOT
 
 
 def main():
@@ -110,12 +102,11 @@ def main():
         tree[e][s] = c
 
     M = int(readline())
-    parant, depth = search(tree)
+    parant, dist = search(tree)
 
     for _ in range(M):
         a, b = map(int, readline().split())
-        res, a, b = leveling(tree, parant, depth, a, b)
-        res += lca(tree, parant, a, b)
+        res = dist[a] + dist[b] - (2 * dist[lca(parant, a, b)])
         print(res)
 
 
