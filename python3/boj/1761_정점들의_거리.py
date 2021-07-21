@@ -62,13 +62,14 @@ def search(tree):
     q = deque([ROOT])
 
     dist[ROOT] = 0
+    parant[ROOT] = [ROOT]
 
     while q:
         cur = q.popleft()
 
         for child, cost in tree[cur].items():
             if dist[child] == -1:
-                parant[child] = [cur] + parant[cur]
+                parant[child] = [child] + parant[cur]
                 dist[child] = dist[cur] + cost
                 q.append(child)
 
