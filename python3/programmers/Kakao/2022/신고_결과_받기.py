@@ -2,9 +2,9 @@ from collections import defaultdict
 
 
 def solution(userIds, report, k):
-    deduplicationReport = set(report)
+    deduplicateReport = set(report)
 
-    reportResult = getReportResult(deduplicationReport)
+    reportResult = getReportResult(deduplicateReport)
     sendMailCounts = getSendMailCounts(reportResult)
 
     return [sendMailCounts[userId] for userId in userIds]
