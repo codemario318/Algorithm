@@ -15,10 +15,11 @@ function getReportPairs(reports) {
 
 function getReportResult(reportPairs) {
     const reportResult = new Map();
-
+    const reportingUserIds = reportResult.get(reportedUserId) ?? [];
+    
     reportPairs.forEach(report => {
         const [reportingUserId, reportedUserId] = report;
-        const reportingUserIds = reportResult.has(reportedUserId) ? reportResult.get(reportedUserId) : [];
+        const reportingUserIds = reportResult.get(reportedUserId) ?? [];
 
         reportingUserIds.push(reportingUserId);
         reportResult.set(reportedUserId, reportingUserIds);
@@ -33,7 +34,7 @@ function getMailCounts(k, reportResult) {
     
     reports.forEach(reportingUserIds => {
         reportingUserIds.forEach(reportingUserId => {
-            const count = mailCounts.has(reportingUserId) ? mailCounts.get(reportingUserId) + 1 : 1;
+            let count = (mailCounts.get(reportingUserId) ?? 0) + 1;
             mailCounts.set(reportingUserId, count);
         })
     })
@@ -42,7 +43,7 @@ function getMailCounts(k, reportResult) {
 }
 
 function mailCountsToArray(userIds, mailCounts) {
-    return userIds.map(userId => mailCounts.has(userId) ? mailCounts.get(userId) : 0);
+    return userIds.map(userId => mailCounts.get(userId) ?? 0);
 }
 
 const userIds = ["muzi", "frodo", "apeach", "neo"],
