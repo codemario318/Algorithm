@@ -41,5 +41,3 @@ def solution(orders, course):
 solution(["ABCFG", "AC", "CDE", "ACDE", "BCFG", "ACDEH"]	,[2,3,4]	)
 solution(["ABCDE", "AB", "CD", "ADE", "XYZ", "XYZ", "ACD"]	, [2,3,5]	)
 solution(["XYZ", "XWY", "WXA"]	, [2,3,4]	)
-
-setMenus[1].most_common
