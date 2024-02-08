@@ -1,29 +1,30 @@
 package leetcode
 
-import (
-	"fmt"
-	"math"
-)
-
 func findLatestStep(arr []int, m int) int {
-	binaries := make([]string, len(arr))
+	binary := make([]rune, len(arr))
+	for i := 0; i < len(binary); i++ {
+		binary[i] = '0'
+	}
+
+	latestSteps := make([]int, len(arr))
 
 	for i, v := range arr {
-		binaries[i] = fmt.Sprintf("%b", v|int(math.Pow(2.0, float64(m))))
+		binary[v] = '1'
+		latestSteps[i] = getLatestBinary(string(binary))
 	}
 
-	latestSteps := make([]string, len(arr))
+	count := 0
 
-	for i, binary := range binaries {
-		latestSteps[i] = getLatestBinary(binary)
+	for _, v := range latestSteps {
+		if v == m {
+			count += 1
+		}
 	}
 
-	fmt.Println(binaries)
-
-	return 0
+	return count
 }
 
-func getLatestBinary(str string) string {
+func getLatestBinary(str string) int {
 	i := len(str) - 1
 
 	for ; i >= 0; i-- {
@@ -40,5 +41,5 @@ func getLatestBinary(str string) string {
 		}
 	}
 
-	return str[j+1 : i+1]
+	return len(str[j+1 : i+1])
 }
