@@ -73,8 +73,8 @@ Olympiad > Croatian Highschool Competitions in Informatics > 2005 > National Com
 문제를 번역한 사람: baemin0103
 데이터를 추가한 사람: dlbae9613
 '''
-from sys import stdin
 from collections import deque
+from sys import stdin
 
 OFFSET = [(-1, 0), (0, -1), (0, 1), (1, 0)]
 WATER = '.'
@@ -85,42 +85,25 @@ readline = stdin.readline
 
 
 def find(parent, pos):
-    if parent[pos] != pos:
-        parent[pos] = find(parent, parent[pos])
-    return parent[pos]
+    i, j = pos
+
+    if parent[i][j] != pos:
+        parent[i][j] = find(parent, parent[i][j])
+
+    return parent[i][j]
 
 
 def union(parent, pos_a, pos_b):
     a, b = find(parent, pos_a), find(parent, pos_b)
 
-    if a < b:
-        parent[b] = a
-    else:
-        parent[a] = b
+    if a != b:
+        ai, aj = a
+        bi, bj = b
 
-
-def get_swan_positions(lake):
-    swans = []
-
-    for i in range(len(lake)):
-        for j in range(len(lake[0])):
-            if lake[i][j] == SWAN:
-                swans.append((i, j))
-
-    return swans
-
-
-def update_parent(parent, lake, cur):
-    i, j = cur
-
-    if lake[i][j] == ICE:
-        return
-
-    for wi, wj in OFFSET:
-        nxt = (ni, nj) = i + wi, j + wj
-
-        if is_in_range(lake, nxt) and (lake[ni][nj] == WATER or lake[ni][nj] == SWAN):
-            union(parent, cur, nxt)
+        if a < b:
+            parent[bi][bj] = a
+        else:
+            parent[ai][aj] = b
 
 
 def is_in_range(board, pos):
@@ -128,37 +111,79 @@ def is_in_range(board, pos):
     return 0 <= i < len(board) and 0 <= j < len(board[0])
 
 
+def update(lake, parent, melted, cur):
+    i, j = cur
+
+    for wi, wj in OFFSET:
+        nxt = ni, nj = i + wi, j + wj
+
+        if not is_in_range(lake, nxt):
+            continue
+
+        if lake[ni][nj] == WATER:
+            union(parent, cur, nxt)
+        elif lake[ni][nj] == ICE and nxt not in melted:
+            melted.add(nxt)
+
+
+def init_parent_melted(lake, pos, parent, melted):
+    queue = deque([pos])
+
+    while queue:
+        i, j = queue.popleft()
+
+        for wi, wj in OFFSET:
+            nxt = ni, nj = i + wi, j + wj
+
+            if not is_in_range(lake, nxt):
+                continue
+
+            if lake[ni][nj] == ICE:
+                melted.add(nxt)
+                continue
+
+            if parent[ni][nj] != pos:
+                parent[ni][nj] = pos
+                queue.append(nxt)
+
+
 if __name__ == '__main__':
     R, C = map(int, readline().split())
     lake = [list(readline().strip()) for _ in range(R)]
-    parent = {(i, j): (i, j) for j in range(C) for i in range(R)}
 
-    queue = deque([(i, j) for j in range(C) for i in range(R) if lake[i][j] != ICE])
+    parent = [[(i, j) for j in range(C)] for i in range(R)]
+    melted = set()
+    swans = []
 
-    for pos in queue:
-        update_parent(parent, lake, pos)
+    for i in range(R):
+        for j in range(C):
+            cur = (i, j)
 
-    swan_a, swan_b = get_swan_positions(lake)
+            if lake[i][j] == ICE:
+                continue
+
+            if lake[i][j] == SWAN:
+                swans.append(cur)
+
+            if parent[i][j] == cur:
+                init_parent_melted(lake, cur, parent, melted)
+
+    swan_a, swan_b = swans
     day = 0
 
-    while queue:
+    while find(parent, swan_a) != find(parent, swan_b):
         day += 1
-        next_queue = deque()
+        next_melted = set()
 
-        while queue:
-            cur = (i, j) = queue.popleft()
-            for wi, wj in OFFSET:
-                nxt = (ni, nj) = i + wi, j + wj
+        for cur in melted:
+            i, j = cur
 
-                if is_in_range(lake, nxt) and lake[ni][nj] == ICE:
-                    lake[ni][nj] = WATER
-                    next_queue.append(nxt)
-                    update_parent(parent, lake, nxt)
+            lake[i][j] = WATER
+            update(lake, parent, next_melted, cur)
 
         if find(parent, swan_a) == find(parent, swan_b):
             break
 
-        queue = next_queue
-
+        melted = next_melted
 
     print(day)
