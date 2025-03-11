@@ -94,65 +94,21 @@ def find(parent, pos):
 
 
 def union(parent, pos_a, pos_b):
-    a, b = find(parent, pos_a), find(parent, pos_b)
+    a = ai, aj = find(parent, pos_a)
+    b = bi, bj = find(parent, pos_b)
 
-    if a != b:
-        ai, aj = a
-        bi, bj = b
-
-        if a < b:
-            parent[bi][bj] = a
-        else:
-            parent[ai][aj] = b
-
-
-def is_in_range(board, pos):
-    i, j = pos
-    return 0 <= i < len(board) and 0 <= j < len(board[0])
-
-
-def update(lake, parent, melted, cur):
-    i, j = cur
-
-    for wi, wj in OFFSET:
-        nxt = ni, nj = i + wi, j + wj
-
-        if not is_in_range(lake, nxt):
-            continue
-
-        if lake[ni][nj] == WATER:
-            union(parent, cur, nxt)
-        elif lake[ni][nj] == ICE and nxt not in melted:
-            melted.add(nxt)
-
-
-def init_parent_melted(lake, pos, parent, melted):
-    queue = deque([pos])
-
-    while queue:
-        i, j = queue.popleft()
-
-        for wi, wj in OFFSET:
-            nxt = ni, nj = i + wi, j + wj
-
-            if not is_in_range(lake, nxt):
-                continue
-
-            if lake[ni][nj] == ICE:
-                melted.add(nxt)
-                continue
-
-            if parent[ni][nj] != pos:
-                parent[ni][nj] = pos
-                queue.append(nxt)
+    if a < b:
+        parent[bi][bj] = a
+    else:
+        parent[ai][aj] = b
 
 
 if __name__ == '__main__':
     R, C = map(int, readline().split())
-    lake = [list(readline().strip()) for _ in range(R)]
+    lake = [readline().strip() for _ in range(R)]
 
-    parent = [[(i, j) for j in range(C)] for i in range(R)]
-    melted = set()
+    visited = [[False for _ in range(C)] for _ in range(R)]
+    queue = deque()
     swans = []
 
     for i in range(R):
@@ -165,25 +121,36 @@ if __name__ == '__main__':
             if lake[i][j] == SWAN:
                 swans.append(cur)
 
-            if parent[i][j] == cur:
-                init_parent_melted(lake, cur, parent, melted)
+            queue.append(cur)
+            visited[i][j] = True
 
+    parent = [[(i, j) for j in range(C)] for i in range(R)]
     swan_a, swan_b = swans
     day = 0
 
-    while find(parent, swan_a) != find(parent, swan_b):
-        day += 1
-        next_melted = set()
+    while queue:
+        for i, j in queue:
+            cur = (i, j)
 
-        for cur in melted:
-            i, j = cur
+            for wi, wj in OFFSET:
+                nxt = ni, nj = i + wi, j + wj
 
-            lake[i][j] = WATER
-            update(lake, parent, next_melted, cur)
+                if 0 <= ni < R and 0 <= nj < C and visited[ni][nj]:
+                    union(parent, cur, nxt)
 
         if find(parent, swan_a) == find(parent, swan_b):
             break
 
-        melted = next_melted
+        day += 1
+
+        for _ in range(len(queue)):
+            cur = i, j = queue.popleft()
+
+            for wi, wj in OFFSET:
+                nxt = ni, nj = i + wi, j + wj
+
+                if 0 <= ni < R and 0 <= nj < C and not visited[ni][nj]:
+                    queue.append(nxt)
+                    visited[ni][nj] = True
 
     print(day)
