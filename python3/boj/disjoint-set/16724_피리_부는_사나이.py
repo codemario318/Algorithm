@@ -47,7 +47,6 @@ University > 한양대학교 ERICA 캠퍼스 > Zero One Algorithm Contest 2018 F
 
 문제를 만든 사람: hellogaon
 '''
-from collections import deque
 from sys import stdin
 
 readline = stdin.readline
@@ -58,52 +57,29 @@ OFFSET = {
     'R': (0, 1)
 }
 
-
-def find(parent, pos):
-    i, j = pos
-    if parent[i][j] != pos:
-        parent[i][j] = find(parent, parent[i][j])
-    return parent[i][j]
-
-
-def union(parent, pos_a, pos_b):
-    pos_a, pos_b = (ai, aj), (bi, bj) = find(parent, pos_a), find(parent, pos_b)
-
-    if pos_a < pos_b:
-        parent[bi][bj] = pos_a
-    else:
-        parent[ai][aj] = pos_b
-
-
-def bfs(board, pos, parent):
-    queue = deque([pos])
-
-    while queue:
-        cur = i, j = queue.popleft()
-        wi, wj = OFFSET[board[i][j]]
-        nxt = i + wi, j + wj
-
-        if find(parent, cur) == find(parent, nxt):
-            continue
-
-        union(parent, cur, nxt)
-        queue.append(nxt)
-
-
 if __name__ == '__main__':
     N, M = map(int, readline().split())
-    board = [readline().strip() for _ in range(N)]
+    board = [readline().rstrip() for _ in range(N)]
 
-    parent = [[(i, j) for j in range(M)] for i in range(N)]
-
-    for i in range(N):
-        for j in range(M):
-            bfs(board, (i, j), parent)
-
-    safe_zone = set()
+    visited = [[0 for j in range(M)] for i in range(N)]
+    step = 0
+    count = 0
 
     for i in range(N):
         for j in range(M):
-            safe_zone.add(find(parent, (i, j)))
+            if visited[i][j] > 0:
+                continue
 
-    print(len(safe_zone))
+            step += 1
+            ci, cj = i, j
+
+            while visited[ci][cj] == 0:
+                visited[ci][cj] = step
+                wi, wj = OFFSET[board[ci][cj]]
+                ci += wi
+                cj += wj
+
+            if visited[ci][cj] == step:
+                count += 1
+
+    print(count)
