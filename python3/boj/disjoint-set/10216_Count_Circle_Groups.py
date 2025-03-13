@@ -45,7 +45,6 @@ readline = stdin.readline
 def find(parent, pos):
     if parent[pos] != pos:
         parent[pos] = find(parent, parent[pos])
-
     return parent[pos]
 
 
@@ -58,32 +57,26 @@ def union(parent, pos_a, pos_b):
         parent[pos_a] = pos_b
 
 
-def is_connect(pos_a, radius_a, pos_b, radius_b):
-    ax, ay = pos_a
-    bx, by = pos_b
+def is_connect(camp_a, camp_b):
+    x1, y1, r1 = camp_a
+    x2, y2, r2 = camp_b
 
-    distance = ((ax - bx) ** 2 + (ay - by) ** 2) ** 0.5
+    distance = (x1 - x2) ** 2 + (y1 - y2) ** 2
+    radius = (r1 + r2) ** 2
 
-    return distance <= radius_a + radius_b
+    return distance <= radius
 
 
 def count_circle_groups(camps):
-    parent = {pos: pos for pos in camps}
+    size = len(camps)
+    parent = [i for i in range(size)]
 
-    for pos_a, radius_a in camps.items():
-        for pos_b, radius_b in camps.items():
-            if pos_a == pos_b:
-                continue
+    for i in range(size):
+        for j in range(i + 1, size):
+            if is_connect(camps[i], camps[j]):
+                union(parent, i, j)
 
-            if is_connect(pos_a, radius_a, pos_b, radius_b):
-                union(parent, pos_a, pos_b)
-
-    groups = set()
-
-    for pos in camps:
-        groups.add(find(parent, pos))
-
-    return len(groups)
+    return len({find(parent, i) for i in range(size)})
 
 
 if __name__ == '__main__':
@@ -91,9 +84,5 @@ if __name__ == '__main__':
 
     for _ in range(T):
         N = int(readline())
-        camps = {}
-        for _ in range(N):
-            x, y, R = map(int, readline().split())
-            camps[(x, y)] = R
-
+        camps = [list(map(int, readline().split())) for _ in range(N)]
         print(count_circle_groups(camps))
