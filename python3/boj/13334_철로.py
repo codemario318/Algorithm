@@ -193,27 +193,28 @@ ICPC > Regionals > Asia Pacific > Korea > Nationwide Internet Competition > Daej
 잘못된 데이터를 찾은 사람: topology
 '''
 from sys import stdin
+from heapq import heappush, heappop
 
 readline = stdin.readline
 
 if __name__ == '__main__':
     n = int(readline())
 
-    rails = []
-
-    for _ in range(n):
-        s, e = map(int, readline().split())
-        rails.append((s, e) if s < e else (e, s))
-
-    rails.sort()
-
+    rails = [sorted(map(int, readline().split())) for _ in range(n)]
     d = int(readline())
 
-    mem = [0 for _ in range(n)]
+    rails.sort(key=lambda x: (x[1]))
 
-    for i in range(n):
-        s = rails[i][0]
-        for j in range(i, n):
-            if s <= rails[j][0] and rails[j][1] <= s + d:
-                mem[i] += 1
-    print(max(mem))
+    max_count = 0
+    heap = []
+
+    for rail in rails:
+        _, e = rail
+        heappush(heap, rail)
+
+        while heap and heap[0][0] < e - d:
+            heappop(heap)
+
+        max_count = max(max_count, len(heap))
+
+    print(max_count)
