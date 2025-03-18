@@ -48,22 +48,27 @@ readline = stdin.readline
 
 
 def search(tree, start):
-    max_dist = 0
+    max_node, max_dist = 0, 0
+    visited = [False] * len(tree)
     queue = deque([(start, 0)])
-    visited = set()
+
+    visited[start] = True
 
     while queue:
         cur, total_cost = queue.popleft()
 
-        max_dist = max(max_dist, total_cost)
+        if total_cost > max_dist:
+            max_dist = total_cost
+            max_node = cur
 
         for nxt, cost in tree[cur]:
-            if nxt in visited:
+            if visited[nxt]:
                 continue
-            queue.append((nxt, total_cost + cost))
-            visited.add(nxt)
 
-    return max_dist
+            queue.append((nxt, total_cost + cost))
+            visited[nxt] = True
+
+    return max_node, max_dist
 
 
 if __name__ == '__main__':
@@ -75,9 +80,7 @@ if __name__ == '__main__':
         tree[s].append((e, c))
         tree[e].append((s, c))
 
-    max_val = 0
+    node, _ = search(tree, 1)
+    _, dist = search(tree, node)
 
-    for i in range(1, n + 1):
-        max_val = max(max_val, search(tree, i))
-
-    print(max_val)
+    print(dist)
