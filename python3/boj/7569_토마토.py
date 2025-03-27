@@ -54,7 +54,7 @@ Olympiad > 한국정보올림피아드 > 한국정보올림피아드시․도지
 문제의 오타를 찾은 사람: mwy3055
 잘못된 데이터를 찾은 사람: tncks0121
 '''
-
+from collections import deque
 from sys import stdin
 
 OFFSET = [(0, 1, 0), (0, -1, 0), (1, 0, 0), (-1, 0, 0), (0, 0, 1), (0, 0, -1)]
@@ -64,64 +64,44 @@ EMPTY = -1
 
 readline = stdin.readline
 
-
-def is_aged(storage, i, j, k):
-    total = 0
-    empty_count = 0
-
-    for wi, wj, wk in OFFSET:
-        ni, nj, nk = i + wi, j + wj, k + wk
-
-        if not is_in_range(storage, ni, nj, nk):
-            continue
-
-        total += 1
-
-        if storage[nk][ni][nj] == AGED:
-            return True
-
-        if storage[nk][ni][nj] == EMPTY:
-            empty_count += 1
-
-    if empty_count == total:
-        raise ValueError
-
-    return False
-
-
-def is_in_range(arr, i, j, k):
-    M, N, H = len(storage[0][0]), len(storage[0]), len(storage)
-    return 0 <= i < M and 0 <= j < N and 0 <= k < H
-
-
-def aging_tomato(storage):
-    M, N, H = len(storage[0][0]), len(storage[0]), len(storage)
-
-    count = 0
-
-    for k in range(H):
-        for i in range(N):
-            for j in range(M):
-                if storage[k][i][j] == AGED or storage[k][i][j] == EMPTY:
-                    count += 1
-                elif storage[k][i][j] == FRESH and is_aged(storage, i, j, k):
-                    count += 1
-                    storage[k][i][j] = AGED
-
-    return count
-
-
 if __name__ == '__main__':
     M, N, H = map(int, readline().split())
     storage = [[list(map(int, readline().split())) for _ in range(N)] for _ in range(H)]
 
-    total = M * M * H
-    not_fresh_count = 0
-    count = 0
+    visited = [[[False for _ in range(M)] for _ in range(N)] for _ in range(H)]
 
-    try:
-        while total > not_fresh_count:
-            not_fresh_count = aging_tomato(storage)
-            count += 1
-    except ValueError:
-        print(-1)
+    queue = deque()
+    day = 0
+
+    for k in range(H):
+        for i in range(N):
+            for j in range(M):
+                if storage[k][i][j] == AGED:
+                    queue.append((k, i, j, 0))
+
+    while queue:
+        ck, ci, cj, step = queue.popleft()
+
+        day = max(day, step)
+
+        for wk, wi, wj in OFFSET:
+            nk, ni, nj = ck + wk, ci + wi, cj + wj
+            if not (0 <= ni < N and 0 <= nj < M and 0 <= nk < H):
+                continue
+
+            if visited[nk][ni][nj]:
+                continue
+
+            if storage[nk][ni][nj] == FRESH:
+                storage[nk][ni][nj] = AGED
+                visited[nk][ni][nj] = True
+                queue.append((nk, ni, nj, step + 1))
+
+    for k in range(H):
+        for i in range(N):
+            for j in range(M):
+                if storage[k][i][j] == FRESH:
+                    print(-1)
+                    exit()
+
+    print(day)
