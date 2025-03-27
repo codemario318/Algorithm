@@ -68,8 +68,6 @@ if __name__ == '__main__':
     M, N, H = map(int, readline().split())
     storage = [[list(map(int, readline().split())) for _ in range(N)] for _ in range(H)]
 
-    visited = [[[False for _ in range(M)] for _ in range(N)] for _ in range(H)]
-
     queue = deque()
     day = 0
 
@@ -86,15 +84,9 @@ if __name__ == '__main__':
 
         for wk, wi, wj in OFFSET:
             nk, ni, nj = ck + wk, ci + wi, cj + wj
-            if not (0 <= ni < N and 0 <= nj < M and 0 <= nk < H):
-                continue
 
-            if visited[nk][ni][nj]:
-                continue
-
-            if storage[nk][ni][nj] == FRESH:
+            if 0 <= ni < N and 0 <= nj < M and 0 <= nk < H and storage[nk][ni][nj] == FRESH:
                 storage[nk][ni][nj] = AGED
-                visited[nk][ni][nj] = True
                 queue.append((nk, ni, nj, step + 1))
 
     for k in range(H):
