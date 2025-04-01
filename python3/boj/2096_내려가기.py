@@ -32,6 +32,13 @@ N줄에 0 이상 9 이하의 숫자가 세 개씩 적혀 있다. 내려가기 �
 0 0 0
 예제 출력 2
 0 0
+
+2
+1 10 1
+2 1 1
+
+12 2
+
 출처
 빠진 조건을 찾은 사람: dreamian
 잘못된 데이터를 찾은 사람: tncks0121
@@ -48,20 +55,24 @@ Kotlin (JVM): 256 MB
 from sys import stdin
 
 readline = stdin.readline
-OFFSET = [-1, 0, 1]
-LIMIT = 3
 
 if __name__ == '__main__':
     N = int(readline())
-    mem_max = [*map(int, readline().split())]
-    mem_min = [*mem_max]
+    prev_max = list(map(int, readline().split()))
+    prev_min = prev_max[:]
 
     for _ in range(N - 1):
-        nums = [*map(int, readline().split())]
+        cur_max = list(map(int, readline().split()))
+        cur_min = cur_max[:]
 
-        for i in range(LIMIT):
-            temp = [nums[i + w] for w in OFFSET if 0 <= i + w < LIMIT]
-            mem_max[i] += max(temp)
-            mem_min[i] += min(temp)
+        cur_max[0] += max(prev_max[0], prev_max[1])
+        cur_max[1] += max(prev_max[0], prev_max[1], prev_max[2])
+        cur_max[2] += max(prev_max[1], prev_max[2])
+        prev_max = cur_max
 
-    print(max(mem_max), min(mem_min))
+        cur_min[0] += min(prev_min[0], prev_min[1])
+        cur_min[1] += min(prev_min[0], prev_min[1], prev_min[2])
+        cur_min[2] += min(prev_min[1], prev_min[2])
+        prev_min = cur_min
+
+    print(max(prev_max), min(prev_min))
