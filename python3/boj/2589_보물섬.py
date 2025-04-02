@@ -62,6 +62,15 @@ LLLL
 
 10
 
+5 9
+LLLLLLLLL
+LWWWLWWWL
+LWWWLWWWL
+LWWWLWWWL
+LLLLLLLLW
+
+15
+
 출처
 Olympiad > 한국정보올림피아드 > 한국정보올림피아드시․도지역본선 > 지역본선 2005 > 초등부 3번
 
@@ -76,44 +85,38 @@ OFFSET = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 LAND = 'L'
 
 
-def bfs(board, pos, visited):
-    queue = deque([(pos, 0)])
+def bfs(board, i, j):
+    visited = [[False for _ in range(M)] for _ in range(N)]
+    visited[i][j] = True
 
+    queue = deque([(i, j, 0)])
     max_step = 0
-    max_pos = pos
 
     while queue:
-        (i, j), step = queue.popleft()
+        i, j, step = queue.popleft()
 
-        if step > max_step:
-            max_step = step
-            max_pos = (i, j)
+        max_step = max(max_step, step)
 
         for wi, wj in OFFSET:
-            nxt = (ni, nj) = i + wi, j + wj
+            (ni, nj) = i + wi, j + wj
 
             if 0 <= ni < N and 0 <= nj < M and board[ni][nj] == LAND and not visited[ni][nj]:
                 visited[ni][nj] = True
-                queue.append((nxt, step + 1))
+                queue.append((ni, nj, step + 1))
 
-    return max_pos, max_step
+    return max_step
 
 
 if __name__ == '__main__':
     N, M = map(int, readline().split())
     board = [list(readline().rstrip()) for _ in range(N)]
 
-    visited = [[False for _ in range(M)] for _ in range(N)]
     max_step = 0
 
     for i in range(N):
         for j in range(M):
-            if board[i][j] == LAND and not visited[i][j]:
-                visited[i][j] = True
-
-                pos, _ = bfs(board, (i, j), visited)
-                _, step = bfs(board, pos, [[False for _ in range(M)] for _ in range(N)])
-
-                max_step = max(max_step, step)
+            if board[i][j] != LAND:
+                continue
+            max_step = max(max_step, bfs(board, i, j))
 
     print(max_step)
