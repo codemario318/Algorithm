@@ -23,15 +23,18 @@ readline = stdin.readline
 
 if __name__ == '__main__':
     N = int(readline())
-
     heights = list(map(int, readline().split()))
 
-    ans = [0] * N
+    answer = [0] * N
+    stack = []
 
-    for i in range(N - 1, 0, -1):
-        for j in range(i, 0, -1):
-            if heights[i] < heights[j]:
-                ans[i] = j + 1
-                break
+    for i, height in enumerate(heights):
+        while stack and stack[-1][1] <= height:
+            stack.pop()
 
-    print(*ans)
+        if stack:
+            answer[i] = stack[-1][0] + 1
+
+        stack.append((i, height))
+
+    print(*answer)
