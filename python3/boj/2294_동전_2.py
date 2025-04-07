@@ -31,20 +31,14 @@ readline = stdin.readline
 
 if __name__ == '__main__':
     n, k = map(int, readline().split())
-    coins = set(int(readline()) for _ in range(n))
+    coins = [int(readline()) for _ in range(n)]
 
-    mem = [-1 for n in range(k + 1)]
+    mem = [float('inf') for n in range(k + 1)]
+    mem[0] = 0
 
     for coin in coins:
-        for num in range(coin, k + 1, coin):
-            mem[num] = num // coin
+        for i in range(coin, k + 1):
+            if mem[i - coin] < float('inf'):
+                mem[i] = min(mem[i], mem[i - coin] + 1)
 
-    for num in range(1, k + 1):
-        if mem[num] > -1:
-            continue
-        for i in range(1, num + 1):
-            if mem[i] == -1:
-                continue
-            mem[num] = min(mem[num], mem[num - i] + mem[i])
-
-    print(mem[-1])
+    print(mem[-1] if mem[-1] < float('inf') else -1)
