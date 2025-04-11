@@ -37,6 +37,7 @@
 '''
 
 from sys import stdin
+from heapq import heappush, heappop, heapify
 
 readline = stdin.readline
 
@@ -58,7 +59,7 @@ def union(parent, a, b):
 
 def kruskal(N, edges):
     edges.sort(key=lambda x: x[-1])
-    
+
     parent = [n for n in range(N + 1)]
 
     count = 0
@@ -80,6 +81,37 @@ def kruskal(N, edges):
     return total
 
 
+def prim(N, edges):
+    tree = [[] for _ in range(N + 1)]
+
+    for a, b, cost in edges:
+        tree[a].append((cost, b))
+        tree[b].append((cost, a))
+
+    queue = [*tree[1]]
+    heapify(queue)
+
+    visited = {1}
+    total = 0
+
+    while queue:
+        cost, cur = heappop(queue)
+
+        if cur in visited:
+            continue
+
+        if len(visited) == N:
+            break
+
+        total += cost
+        visited.add(cur)
+
+        for nxt in tree[cur]:
+            heappush(queue, nxt)
+
+    return total
+
+
 if __name__ == '__main__':
     N = int(readline())
     M = int(readline())
@@ -87,3 +119,4 @@ if __name__ == '__main__':
     edges = [list(map(int, readline().split())) for _ in range(M)]
 
     print(kruskal(N, edges))
+    print(prim(N, edges))
