@@ -56,17 +56,13 @@ def union(parent, a, b):
         parent[a] = b
 
 
-if __name__ == '__main__':
-    N = int(readline())
-    M = int(readline())
-
-    edges = [list(map(int, readline().split())) for _ in range(M)]
+def kruskal(N, edges):
     edges.sort(key=lambda x: x[-1])
+    
+    parent = [n for n in range(N + 1)]
 
     count = 0
     total = 0
-
-    parent = [n for n in range(N + 1)]
 
     for edge in edges:
         a, b, cost = edge
@@ -81,4 +77,13 @@ if __name__ == '__main__':
         count += 1
         total += cost
 
-    print(total)
+    return total
+
+
+if __name__ == '__main__':
+    N = int(readline())
+    M = int(readline())
+
+    edges = [list(map(int, readline().split())) for _ in range(M)]
+
+    print(kruskal(N, edges))
