@@ -36,8 +36,7 @@ N×N 크기의 공간에 물고기 M마리와 아기 상어 1마리가 있다. �
 출력
 첫째 줄에 아기 상어가 엄마 상어에게 도움을 요청하지 않고 물고기를 잡아먹을 수 있는 시간을 출력한다.
 '''
-from collections import deque
-from heapq import heapify, heappop, heappush
+from heapq import heappop, heappush
 from sys import stdin
 
 readline = stdin.readline
@@ -54,10 +53,10 @@ def bfs(board, pos, size):
     min_step = float('inf')
 
     while queue:
-        step, i, j = heappop(queue)
+        step, (i, j) = heappop(queue)
 
-        if board[i][j] < size:
-            return step, i, j, board[i][j]
+        if 0 < board[i][j] < size:
+            return step, i, j
 
         for wi, wj in OFFSET:
             nxt = ni, nj = i + wi, j + wj
@@ -66,7 +65,7 @@ def bfs(board, pos, size):
                 visited.add(nxt)
                 heappush(queue, (step + 1, nxt))
 
-    return min_step
+    return min_step, -1, -1
 
 
 def get_shark_pos(board):
@@ -82,18 +81,27 @@ if __name__ == '__main__':
     N = int(readline())
     board = [list(map(int, readline().split())) for _ in range(N)]
 
-    shark_pos = get_shark_pos(board)
+    shark_pos = si, sj = get_shark_pos(board)
+    board[si][sj] = 0
+
     shark_size = INIT_SIZE
+    fish_count = 0
     total_time = 0
 
     while True:
-        time, i, j, size = bfs(board, shark_pos, shark_size)
+        time, i, j = bfs(board, shark_pos, shark_size)
 
         if time == float('inf'):
             break
 
+        board[i][j] = 0
+        fish_count += 1
+
+        if fish_count == shark_size:
+            fish_count = 0
+            shark_size += 1
+
         shark_pos = (i, j)
-        shark_size += size
         total_time += time
 
     print(total_time)
