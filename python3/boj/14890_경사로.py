@@ -106,45 +106,41 @@ L = 2인 경우에 경사로를 놓을 수 있는 경우를 그림으로 나타�
 문제를 만든 사람: baekjoon
 데이터를 추가한 사람: byon26, da3107, kimyh0316, qkrjh0904
 '''
-from collections import deque, Counter
 from sys import stdin
 
 readline = stdin.readline
 
 
-def solution(arr, window_size):
-    print(arr)
-    window = deque()
-    counter = Counter()
+def solution(arr, step_size):
+    cur = 1
+    used = set()
 
-    for num in arr[:window_size]:
-        if not window or window[-1] == num:
-            window.append(num)
-            counter[num] += 1
-        else:
-            return False
-
-    for cur in arr[window_size:]:
-        print(window)
-        print(counter)
-
-        if cur == window[-1]:
-            window.append(cur)
-            counter[cur] += 1
-            counter[window.popleft()] -= 1
+    while cur < len(arr):
+        if arr[cur] == arr[cur - 1]:
+            cur += 1
             continue
 
-        if cur < window[-1] or cur - window[-1] > 1:
+        if abs(arr[cur] - arr[cur - 1]) > 1:
             return False
 
-        if counter[window[-1]] != window_size:
-            return False
+        if arr[cur - 1] > arr[cur]:
+            if cur + step_size - 1 >= len(arr):
+                return False
+            for nxt in range(cur, cur + step_size):
+                if arr[nxt] != arr[cur] or nxt in used:
+                    return False
+                used.add(nxt)
 
-        counter[window.popleft()] -= 1
+            cur += step_size
+        else:
+            if cur - step_size < 0:
+                return False
+            for nxt in range(cur - 1, cur - step_size - 1, -1):
+                if arr[nxt] != arr[cur - 1] or nxt in used:
+                    return False
+                used.add(nxt)
+            cur += 1
 
-        window.append(cur)
-        counter[cur] += 1
-    print('True')
     return True
 
 
@@ -155,10 +151,7 @@ if __name__ == '__main__':
     total_count = 0
 
     for i in range(N):
-        row = board[i]
-        total_count += solution(row, L) or solution(list(reversed(row)), L)
-
-        col = [board[j][i] for j in range(N)]
-        total_count += solution(col, L) or solution(list(reversed(col)), L)
+        total_count += solution(board[i], L)
+        total_count += solution([board[j][i] for j in range(N)], L)
 
     print(total_count)
