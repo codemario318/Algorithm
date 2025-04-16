@@ -60,7 +60,6 @@ readline = stdin.readline
 JIHUN = 'J'
 FIRE = 'F'
 EMPTY = '.'
-WALL = '#'
 OFFSET = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
 
@@ -82,16 +81,16 @@ def find_fires(board):
 
 
 def solution(board):
-    pos = find_jihun(board)
-    jihun_queue = deque([(pos, 0)])
+    jihun_queue = deque([find_jihun(board)])
     fire_queue = deque(find_fires(board))
 
-    min_step = float('inf')
+    step = 0
 
     while jihun_queue:
+        step += 1
+
         for _ in range(len(jihun_queue)):
-            cur, step = jihun_queue.popleft()
-            i, j = cur
+            i, j = jihun_queue.popleft()
 
             if board[i][j] == FIRE:
                 continue
@@ -101,10 +100,10 @@ def solution(board):
 
                 if 0 <= ni < len(board) and 0 <= nj < len(board[0]):
                     if board[ni][nj] == EMPTY:
-                        jihun_queue.append((nxt, step + 1))
+                        jihun_queue.append(nxt)
                         board[ni][nj] = JIHUN
                 else:
-                    min_step = min(min_step, step + 1)
+                    return step
 
         for _ in range(len(fire_queue)):
             i, j = fire_queue.popleft()
@@ -115,16 +114,10 @@ def solution(board):
                     board[ni][nj] = FIRE
                     fire_queue.append(nxt)
 
-    return min_step
+    return 'IMPOSSIBLE'
 
 
 if __name__ == '__main__':
     R, C = map(int, readline().split())
     board = [list(readline().rstrip()) for _ in range(R)]
-
-    result = solution(board)
-
-    if result == float('inf'):
-        print('IMPOSSIBLE')
-    else:
-        print(result)
+    print(solution(board))
