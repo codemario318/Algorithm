@@ -86,8 +86,6 @@ def solution(board):
     jihun_queue = deque([(pos, 0)])
     fire_queue = deque(find_fires(board))
 
-    visited = {pos}
-
     min_step = float('inf')
 
     while jihun_queue:
@@ -104,7 +102,7 @@ def solution(board):
                 if 0 <= ni < len(board) and 0 <= nj < len(board[0]):
                     if board[ni][nj] == EMPTY:
                         jihun_queue.append((nxt, step + 1))
-                        visited.add(nxt)
+                        board[ni][nj] = JIHUN
                 else:
                     min_step = min(min_step, step + 1)
 
