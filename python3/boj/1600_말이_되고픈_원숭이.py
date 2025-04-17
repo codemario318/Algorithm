@@ -53,42 +53,46 @@ HORSE = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (2, -1), (2, 1), (1, -2), (1, 2)]
 def solution(board, K):
     di, dj = len(board) - 1, len(board[0]) - 1
     queue = deque([(0, 0, 0, K)])
-    visited = {(0, 0)}
+    visited = [[[False for _ in range(K + 1)] for _ in range(dj + 1)] for _ in range(di + 1)]
 
-    min_step = float('inf')
+    visited[0][0][K] = True
 
     while queue:
-        i, j, step, k = queue.popleft()
+        i, j, s, k = queue.popleft()
 
         if (i, j) == (di, dj):
-            min_step = min(min_step, step)
-            continue
+            return s
 
         for wi, wj in OFFSET:
-            nxt = (ni, nj) = i + wi, j + wj
-            if 0 <= ni <= di and 0 <= nj <= dj and board[ni][nj] == 0 and nxt not in visited:
-                visited.add(nxt)
-                queue.append((ni, nj, step + 1, k))
+            ni, nj = i + wi, j + wj
+            if ni < 0 or ni > di or nj < 0 or nj > dj:
+                continue
 
-        if k <=0:
+            if board[ni][nj] == 1 or visited[ni][nj][k]:
+                continue
+
+            visited[ni][nj][k] = True
+            queue.append((ni, nj, s + 1, k))
+
+        if k <= 0:
             continue
 
         for wi, wj in HORSE:
-            nxt = (ni, nj) = i + wi, j + wj
-            if 0 <= ni <= di and 0 <= nj <= dj and board[ni][nj] == 0 and nxt not in visited:
-                visited.add(nxt)
-                queue.append((ni, nj, step + 1, k - 1))
+            ni, nj = i + wi, j + wj
+            if ni < 0 or ni > di or nj < 0 or nj > dj:
+                continue
 
-    return min_step
+            if board[ni][nj] == 1 or visited[ni][nj][k - 1]:
+                continue
+
+            visited[ni][nj][k - 1] = True
+            queue.append((ni, nj, s + 1, k - 1))
+
+    return -1
 
 if __name__ == '__main__':
     K = int(readline())
     W, H = map(int, readline().split())
     board = [list(map(int, readline().split())) for _ in range(H)]
 
-    result = solution(board, K)
-
-    if result == float('inf'):
-        print(-1)
-    else:
-        print(result)
+    print(solution(board, K))
