@@ -54,19 +54,56 @@ from sys import stdin
 readline = stdin.readline
 
 
-def search_word_count(doc, word):
-    s = 0
+def compute_lps(pattern):
+    m = len(pattern)
+    lps = [0 for _ in range(m)]
+
+    length = 0
+    i = 1
+
+    while i < m:
+        if pattern[i] == pattern[length]:
+            length += 1
+            lps[i] = length
+            i += 1
+        else:
+            if length > 0:
+                length = lps[length - 1]
+            else:
+                lps[i] = 0
+                i += 1
+
+    return lps
+
+
+def search_word_count(text, pattern):
+    n = len(text)
+    m = len(pattern)
+
+    if m == 0:
+        return 0
+
+    lps = compute_lps(pattern)
+
+    i, j = 0, 0
     count = 0
 
-    while s <= len(doc) - len(word):
-        if doc[s: s + len(word)] == word:
+    while i < n:
+        if text[i] == pattern[j]:
+            i += 1
+            j += 1
+
+        if j == m:
             count += 1
-            s += len(word)
-        else:
-            s += 1
+            i = i - j + m
+            j = 0
+        elif i < n and text[i] != pattern[j]:
+            if j > 0:
+                j = lps[j - 1]
+            else:
+                i += 1
 
     return count
-
 
 if __name__ == '__main__':
     doc = readline().rstrip()
