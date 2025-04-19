@@ -71,6 +71,14 @@ o#
 3
 출처
 문제를 번역한 사람: baekjoon
+
+4 6
+######
+#o....
+#o....
+######
+
+6
 '''
 from collections import deque
 from sys import stdin
@@ -79,7 +87,7 @@ readline = stdin.readline
 OFFSET = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 COIN = 'o'
 WALL = '#'
-
+LIMIT = 10
 
 def find_coins(board):
     return [(i, j) for i in range(len(board)) for j in range(len(board[-1])) if board[i][j] == COIN]
@@ -107,11 +115,17 @@ def solution(board):
     while queue:
         a, b, step = queue.popleft()
 
+        if step >= LIMIT:
+            return -1
+
         if drop_coin(board, a) or drop_coin(board, b):
             return step
 
         for offset in OFFSET:
             a_next, b_next = get_next(board, a, offset), get_next(board, b, offset)
+
+            if a_next == b_next:
+                continue
 
             if drop_coin(board, a_next) and drop_coin(board, b_next):
                 continue
