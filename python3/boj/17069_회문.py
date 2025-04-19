@@ -42,12 +42,7 @@ from sys import stdin
 readline = stdin.readline
 
 
-def is_palindrome(s):
-    if len(s) <= 1:
-        return True
-
-    left, right = 0, len(s) - 1
-
+def is_palindrome(s, left, right):
     while left < right:
         if s[left] != s[right]:
             return False
@@ -58,15 +53,21 @@ def is_palindrome(s):
 
 
 def solution(text):
-    if is_palindrome(text):
+    left, right = 0, len(text) - 1
+
+    if is_palindrome(text, left, right):
         return 0
 
-    for i in range(len(text)):
-        if is_palindrome(text[:i] + text[i + 1:]):
-            return 1
+    while left < right:
+        if text[left] != text[right]:
+            if is_palindrome(text, left + 1, right) or is_palindrome(text, left, right - 1):
+                return 1
+            else:
+                return 2
 
-    return 2
-
+        left += 1
+        right -= 1
+    
 
 if __name__ == '__main__':
     T = int(readline())
