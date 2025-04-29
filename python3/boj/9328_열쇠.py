@@ -70,80 +70,80 @@ readline = stdin.readline
 
 OFFSET = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
+NO_KEY = '0'
 EMPTY = '.'
 WALL = '*'
 TARGET = '$'
 
 
-def init_key(keys):
-    key_mask = 0
-
-    if keys != ['0']:  # '0'은 키가 없는 경우
-        for key in keys:
-            key_mask |= (1 << (ord(key) - ord('a')))
-
-    return key_mask
+def update_mask(mask, key):
+    key_index = ord(key) - ord('a')
+    return mask | (1 << key_index)
 
 
-def get_start(board, h, w):
-    starts = []
+def init_mask(keys):
+    mask = 0
 
-    for i in range(h):
-        for j in range(w):
-            if (i == 0 or i == h - 1 or j == 0 or j == w - 1) and board[i][j] != WALL:
-                starts.append((i, j))
+    for key in keys:
+        mask = update_mask(mask, key)
 
-    return starts
+    return mask
 
 
-def is_key(value):
-    return 'a' <= value <= 'z'
+def get_start_positions(h, w):
+    return [(i, j) for i in range(h) for j in range(w) if i == 0 or i == w - 1 or j == 0 or j == h - 1]
 
 
 def is_door(value):
     return 'A' <= value <= 'Z'
 
 
-def set_visited(mask, key):
-    return mask | (1 << (ord(key) - ord('a')))
+def is_key(value):
+    return 'a' <= value <= 'z'
+
+
+def has_key(mask, door):
+    door_index = ord(door) - ord('A')
+    return mask & (1 << door_index)
 
 
 def solution(board, h, w, keys):
-    key_mask = init_key(keys)
-
     visited = [[set() for _ in range(w)] for _ in range(h)]
-    queue = deque()
+    mask = init_mask(keys)
+    queue = deque(map(lambda pos: (pos, mask), get_start_positions(h, w)))
 
-    for i, j in get_start(board, h, w):
-        queue.append((i, j, key_mask))
-        visited[i][j].add(key_mask)
+    for (i, j), mask in queue:
+        visited[i][j].add(mask)
 
     documents = 0
 
     while queue:
-        i, j, mask = queue.popleft()
+        (i, j), mask = queue.popleft()
 
         if board[i][j] == TARGET:
             documents += 1
             board[i][j] = EMPTY
 
-
         for wi, wj in OFFSET:
-            ni, nj = i + wi, j + wj
+            nxt = ni, nj = i + wi, j + wj
+
+            if 0 > ni or ni >= h or 0 > nj or nj >= w:
+                continue
+
+            if board[ni][nj] == WALL:
+                continue
+
+            if is_door(board[ni][nj]) and not has_key(mask, board[ni][nj]):
+                continue
+
             new_mask = mask
 
-            if 0 <= ni < h and 0 <= nj < w and board[ni][nj] != WALL:
-                if is_door(board[ni][nj]):
-                    door_idx = ord(board[ni][nj]) - ord('A')
-                    if not (mask & (1 << door_idx)):
-                        continue
+            if is_key(board[ni][nj]):
+                new_mask = update_mask(mask, board[ni][nj])
 
-                if is_key(board[ni][nj]):
-                    new_mask = set_visited(mask, board[ni][nj])
-
-                if new_mask not in visited[ni][nj]:
-                    visited[ni][nj].add(mask)
-                    queue.append((ni, nj, mask))
+            if new_mask not in visited[ni][nj]:
+                visited[ni][nj].add(new_mask)
+                queue.append((nxt, new_mask))
 
     return documents
 
@@ -153,7 +153,12 @@ if __name__ == '__main__':
 
     for _ in range(T):
         h, w = map(int, readline().split())
-        board = [list(readline().rstrip()) for _ in range(h)]
-        keys_input = readline().rstrip()
-        keys = ['0'] if keys_input == "0" else list(keys_input)
-        print(solution(board, h, w, keys))
+        board = [
+            [EMPTY for _ in range(w + 2)],
+            *[[EMPTY, *readline().rstrip(), EMPTY] for _ in range(h)],
+            [EMPTY for _ in range(w + 2)]
+        ]
+        key_string = readline().rstrip()
+        keys = [] if key_string == NO_KEY else list(key_string)
+
+        print(solution(board, h + 2, w + 2, keys))
