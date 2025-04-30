@@ -91,7 +91,7 @@ def init_mask(keys):
 
 
 def get_start_positions(h, w):
-    return [(i, j) for i in range(h) for j in range(w) if i == 0 or i == w - 1 or j == 0 or j == h - 1]
+    return [(i, j) for i in range(h) for j in range(w) if i == 0 or i == h - 1 or j == 0 or j == w - 1]
 
 
 def is_door(value):
@@ -104,16 +104,16 @@ def is_key(value):
 
 def has_key(mask, door):
     door_index = ord(door) - ord('A')
-    return mask & (1 << door_index)
+    return (mask & (1 << door_index)) != 0
 
 
 def solution(board, h, w, keys):
-    visited = [[set() for _ in range(w)] for _ in range(h)]
+    visited = [[-1 for _ in range(w)] for _ in range(h)]
     mask = init_mask(keys)
     queue = deque(map(lambda pos: (pos, mask), get_start_positions(h, w)))
 
     for (i, j), mask in queue:
-        visited[i][j].add(mask)
+        visited[i][j] = mask
 
     documents = 0
 
@@ -141,8 +141,8 @@ def solution(board, h, w, keys):
             if is_key(board[ni][nj]):
                 new_mask = update_mask(mask, board[ni][nj])
 
-            if new_mask not in visited[ni][nj]:
-                visited[ni][nj].add(new_mask)
+            if visited[ni][nj] == -1 or (new_mask & visited[ni][nj]) != new_mask:
+                visited[ni][nj] = new_mask if visited[ni][nj] == -1 else (visited[ni][nj] | new_mask)
                 queue.append((nxt, new_mask))
 
     return documents
