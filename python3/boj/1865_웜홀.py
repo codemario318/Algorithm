@@ -42,28 +42,29 @@ readline = stdin.readline
 
 
 def solution(N, edges, wormholes):
-    INF = float('inf')
-    dist = [[INF for _ in range(N + 1)] for _ in range(N + 1)]
-
-    for i in range(1, N + 1):
-        dist[i][i] = 0
+    graph = []
 
     for s, e, t in edges:
-        dist[s][e] = min(dist[s][e], t)
-        dist[e][s] = min(dist[e][s], t)
+        graph.append((s, e, t))
+        graph.append((e, s, t))
 
     for s, e, t in wormholes:
-        dist[s][e] = min(dist[s][e], -t)
+        graph.append((s, e, -t))
 
-    for k in range(1, N + 1):
-        for i in range(1, N + 1):
-            for j in range(1, N + 1):
-                if dist[i][k] != INF and dist[k][j] != INF:
-                    dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j])
+    dist = [0] * (N + 1)
 
-    for i in range(1, N + 1):
-        if dist[i][i] < 0:
-            return "YES"
+    for i in range(N):
+        updated = False
+        for start, end, time in graph:
+            if dist[end] > dist[start] + time:
+                dist[end] = dist[start] + time
+                updated = True
+
+                if i == N - 1:
+                    return "YES"
+
+        if not updated:
+            break
 
     return "NO"
 
