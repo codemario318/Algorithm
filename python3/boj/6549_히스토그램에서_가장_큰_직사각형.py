@@ -59,31 +59,33 @@ from sys import stdin
 readline = stdin.readline
 
 
-def solution(arr):
+def solution(heights):
     stack = []
     max_area = 0
+    i = 0
 
-    for i, h in enumerate(arr):
-        while stack and arr[stack[-1]] > h:
-            j = stack.pop()
+    while i < len(heights):
+        if not stack or heights[stack[-1]] <= heights[i]:
+            stack.append(i)
+            i += 1
+        else:
+            top = stack.pop()
+            width = i if not stack else i - stack[-1] - 1
+            max_area = max(max_area, width * heights[top])
 
-            height = arr[j]
-            width = i - j if stack else i
+    while stack:
+        top = stack.pop()
+        width = i if not stack else i - stack[-1] - 1
+        max_area = max(max_area, width * heights[top])
 
-            area = width * height
-
-            if max_area < area:
-                max_area = area
-
-        stack.append(i)
     return max_area
 
 
-while True:
-    n, *arr = map(int, readline().split())
+if __name__ == '__main__':
+    while True:
+        N, *heights = map(int, readline().split())
 
-    if not n:
-        break
+        if not N:
+            break
 
-    arr.append(0)
-    print(solution(arr))
+        print(solution(heights))
