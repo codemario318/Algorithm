@@ -49,7 +49,7 @@ class Solution:
 
         return "".join(merged)
 
-    def getChar(self, word: str, index: int) -> char:
+    def getChar(self, word: str, index: int) -> str:
         try:
             return word[index]
         except IndexError:
