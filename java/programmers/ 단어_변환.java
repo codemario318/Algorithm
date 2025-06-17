@@ -38,18 +38,6 @@ class State {
         this.word = word;
         this.step = step;
     }
-
-    int calcDistance(String target) {
-        int count = 0;
-
-        for (int i = 0; i < word.length(); i++) {
-            if (word.charAt(i) != target.charAt(i)) {
-                count++;
-            }
-        }
-
-        return count;
-    }
 }
 
 class Solution {
@@ -75,7 +63,7 @@ class Solution {
 
             wordList.stream()
                     .filter((word) -> !visited.contains(word))
-                    .filter((word) -> state.calcDistance(word) == 1)
+                    .filter((word) -> calcDistance(state.word, word) == 1)
                     .forEach((word) -> {
                         visited.add(word);
                         queue.add(new State(word, state.step + 1));
@@ -83,5 +71,17 @@ class Solution {
         }
 
         return 0;
+    }
+
+    static int calcDistance(String begin, String target) {
+        int count = 0;
+
+        for (int i = 0; i < begin.length(); i++) {
+            if (begin.charAt(i) != target.charAt(i)) {
+                count++;
+            }
+        }
+
+        return count;
     }
 }
