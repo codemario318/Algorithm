@@ -46,10 +46,10 @@ class Solution {
             if (cnt == 0) {
                 map.remove(c);
             } else {
-                map.replace(c, cnt);
+                map.put(c, cnt);
             }
         }
 
-        return (String) map.keySet().toArray()[0];
+        return map.keySet().iterator().next();
     }
 }
