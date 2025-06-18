@@ -29,27 +29,48 @@ participant	completion	return
 ※ 공지 - 2023년 01월 25일 테스트케이스가 추가되었습니다.
 """
 
+//import java.util.*;
+//
+//class Solution {
+//    public String solution(String[] participant, String[] completion) {
+//        Map<String, Integer> map = new HashMap<>();
+//
+//        for(String p: participant) {
+//            map.put(p, map.getOrDefault(p, 0) + 1);
+//        }
+//
+//
+//        for(String c: completion) {
+//            int cnt = map.get(c) - 1;
+//
+//            if (cnt == 0) {
+//                map.remove(c);
+//            } else {
+//                map.put(c, cnt);
+//            }
+//        }
+//
+//        return map.keySet().iterator().next();
+//    }
+//}
+
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 class Solution {
     public String solution(String[] participant, String[] completion) {
-        Map<String, Integer> map = new HashMap<>();
+        Map<String, Long> participantMap = Arrays.stream(participant)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-        for(String p: participant) {
-            map.put(p, map.getOrDefault(p, 0) + 1);
-        }
+        for (String name : completion) {
+            participantMap.merge(name, -1L, Long::sum);
 
-
-        for(String c: completion) {
-            int cnt = map.get(c) - 1;
-
-            if (cnt == 0) {
-                map.remove(c);
-            } else {
-                map.put(c, cnt);
+            if (participantMap.get(name) == 0L) {
+                participantMap.remove(name);
             }
         }
 
-        return map.keySet().iterator().next();
+        return participantMap.keySet().iterator().next();
     }
 }
