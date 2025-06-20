@@ -30,16 +30,95 @@ phone_book	return
 첫 번째 전화번호, “12”가 두 번째 전화번호 “123”의 접두사입니다. 따라서 답은 false입니다.
 """
 
+//import java.util.*;
+//
+//class Solution {
+//    public boolean solution(String[] phoneBook) {
+//        Arrays.sort(phoneBook);
+//
+//        for (int i = 0; i < phoneBook.length - 1; i++) {
+//            if (phoneBook[i + 1].startsWith(phoneBook[i])) {
+//                return false;
+//            }
+//        }
+//
+//        return true;
+//    }
+//}
+
 import java.util.*;
+
+class TrieNode {
+    private Map<Character, TrieNode> children;
+    public boolean isEnd;
+
+    TrieNode(Map<Character, TrieNode> children, boolean isEnd) {
+        this.children = children;
+        this.isEnd = isEnd;
+    }
+
+    public TrieNode getChild(Character c) {
+        if (!hasChild(c)) {
+            throw new IllegalStateException("Child not found: " + c);
+        }
+        return children.get(c);
+    }
+
+    public boolean hasChild(Character c) {
+        return children.containsKey(c);
+    }
+
+    public void addChild(Character c, TrieNode child) {
+        this.children.put(c, child);
+    }
+
+    public int countChildren() {
+        return children.size();
+    }
+}
+
+class Trie {
+    private TrieNode root;
+
+    Trie(TrieNode root) {
+        this.root = root;
+    }
+
+    void insert(String word) {
+        TrieNode cur = root;
+
+        for (char c : word.toCharArray()) {
+            if (cur.isEnd) {
+                throw new IllegalStateException("Prefix conflict");
+            }
+
+            if (cur.hasChild(c)) {
+                cur = cur.getChild(c);
+            } else {
+                TrieNode next = new TrieNode(new HashMap<>(), false);
+                cur.addChild(c, next);
+                cur = next;
+            }
+        }
+
+        if (cur.countChildren() > 0) {
+            throw new IllegalStateException("This word is prefix of another");
+        }
+
+        cur.isEnd = true;
+    }
+}
 
 class Solution {
     public boolean solution(String[] phoneBook) {
-        Arrays.sort(phoneBook);
+        Trie trie = new Trie(new TrieNode(new HashMap<>(), false));
 
-        for (int i = 0; i < phoneBook.length - 1; i++) {
-            if (phoneBook[i + 1].startsWith(phoneBook[i])) {
-                return false;
+        try {
+            for (String number : phoneBook) {
+                trie.insert(number);
             }
+        } catch (IllegalStateException e) {
+            return false;
         }
 
         return true;
