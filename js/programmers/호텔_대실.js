@@ -40,17 +40,8 @@ function solution(book_time) {
     const rooms = [];
 
     bookTimes.forEach(([start, end]) => {
-        let assigned = false;
-
-        for (let i = 0; i < rooms.length; i++) {
-            if (rooms[i] <= start) {
-                rooms[i] = end;
-                assigned = true;
-                break;
-            }
-        }
-
-        assigned || rooms.push(end);
+        const roomIdx = rooms.findIndex(room => room <= start);
+        roomIdx >= 0 ? rooms[roomIdx] = end : rooms.push(end);
     });
 
     return rooms.length;
