@@ -20,7 +20,7 @@ storey	result
 
 -1, +100이 적힌 버튼을 4번, +10이 적힌 버튼을 5번, -1000이 적힌 버튼을 3번 누르면 0층에 도착 할 수 있습니다. 그러므로 16을 return 합니다.
 
-2954 -> 13
+2954 -> ~13~ 12
 9999 -> 2
 8889 -> 5
 */
@@ -51,12 +51,13 @@ function solution(storey) {
 
     while (storey > 0) {
         const num = storey % 10;
+        const nextNum = Math.floor((storey / 10) % 10);
         const diff = 10 - num;
 
         storey -= num;
         storey /= 10;
 
-        if (num > 5) {
+        if (num > 5 || (num === 5 && nextNum >= 5)) {
             answer += diff;
             storey += 1
         } else {
