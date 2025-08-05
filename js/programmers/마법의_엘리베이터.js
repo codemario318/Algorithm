@@ -25,45 +25,17 @@ storey	result
 8889 -> 5
 */
 
-/*
-그리디
-
-~더하는게 더 적은가? 빼는게 더 적은가?~
--> 더 작은 값으로 갈 수 있는 경우가 있는가?
-
-[2554]
-1000 * 2 -> 100 * 5 -> 10 * 5 -> 1 * 4 = 16
-
-[2954]
--100 * 1 -> 1000 * 3 -> 10 * 5 -> 1 * 4 = 13
-
-[9999]
-
-+1 -> -10000 = 2
----
-
-그대로 버튼을 누르는 것과 자리수를 올리는 걸 비교해서 answer 계산
-- 자리수 올리는게 더 적다면 올리기
-*/
-
 function solution(storey) {
-    let answer = 0;
-
-    while (storey > 0) {
-        const num = storey % 10;
-        const nextNum = Math.floor((storey / 10) % 10);
-        const diff = 10 - num;
-
-        storey -= num;
-        storey /= 10;
-
-        if (num > 5 || (num === 5 && nextNum >= 5)) {
-            answer += diff;
-            storey += 1
-        } else {
-            answer += num;
-        }
+    if (storey < 5) {
+        return storey;
     }
 
-    return answer;
+    const digit = storey % 10;
+    const diff = 10 - digit;
+    const nextStorey = Math.floor(storey / 10);
+
+    return Math.min(
+        digit + solution(nextStorey),
+        diff + solution(nextStorey + 1)
+    );
 }
