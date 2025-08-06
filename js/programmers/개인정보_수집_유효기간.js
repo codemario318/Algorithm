@@ -81,11 +81,9 @@ function solution(today, terms, privacies) {
     const base = dateToDays(today);
     const policies = makePolicies(terms);
 
-    return privacies
-        .map(policy => checkPrivacy(policies, policy, base))
-        .map((r, index) => [r, index + 1])
-        .filter(([res, _]) => res)
-        .map(([_, number]) => number);
+    return privacies.flatMap(
+        (p, i) => checkPrivacy(policies, p, base) ? [i + 1] : []
+    );
 }
 
 function checkPrivacy(policies, privacy, base) {
@@ -109,5 +107,3 @@ function makePolicies(terms) {
         return [type, toDays(0, Number(month), 0)];
     }));
 }
-
-
