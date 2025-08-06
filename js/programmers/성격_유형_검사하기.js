@@ -155,32 +155,39 @@ survey	choices	result
 따라서 "RCJA"를 return 해야 합니다.
 */
 
-const TYPES = ['R', 'T', 'C', 'F', 'J', 'M', 'A', 'N'];
-const INDICATOR = [['R','T'], ['C', 'F'], ['J', 'M'], ['A','N']]
-const MID = 4;
+const TYPES = ['RT', 'CF', 'JM', 'AN'];
+const PASS = 4;
+
+class Counter {
+    #counter;
+
+    constructor(map) {
+        this.#counter = map;
+    }
+
+    get(key) {
+        return this.#counter.get(key) ?? 0;
+    }
+
+    add(key, value = 1) {
+        this.#counter.set(key, this.get(key) + value);
+    }
+}
 
 function solution(survey, choices) {
-    const scores = new Map(TYPES.map(t => [t, 0]));
+    const scores = new Counter(new Map());
 
     for (let i = 0; i < survey.length; i++) {
-        const typeA = survey[i].at(0), typeB = survey[i].at(1);
+        const [disagree, agree] = survey.at(i);
         const choice = choices.at(i);
 
-        if (choice === MID) {
-            continue;
-        }
-
-        if (choice < MID) {
-            const score = (scores.get(typeA) ?? 0) + MID - choice;
-            scores.set(typeA, score);
-        } else {
-            const score = (scores.get(typeB) ?? 0) + choice - MID;
-            scores.set(typeB, score);
-        }
+        scores.add(
+            choice > PASS ? agree : disagree,
+            Math.abs(PASS - choice)
+        )
     };
 
-    return INDICATOR.map(([a, b]) => {
-        const scoreA = scores.get(a), scoreB = scores.get(b);
-        return scoreA >= scoreB ? a : b;
-    }).join('');
+    return TYPES
+        .map(([a, b]) => scores.get(b) > scores.get(a) ? b: a)
+        .join('');
 }
