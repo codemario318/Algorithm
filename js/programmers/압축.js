@@ -7,10 +7,13 @@ function solution(msg) {
     const msgArray = [...msg];
 
     let prevWord = '';
+    let index = 0;
 
-    while (msgArray.length > 0) {
-        const char = msgArray.shift();
+    while (index < msgArray.length) {
+        const char = msgArray[index];
         const word = `${prevWord}${char}`;
+
+        index++;
 
         if (wordCodes.has(word)) {
             prevWord = word;
