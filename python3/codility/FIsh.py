@@ -37,28 +37,22 @@ the elements of A are all distinct.
 Copyright 2009–2025 by Codility Limited. All Rights Reserved. Unauthorized copying, publication or disclosure prohibited.
 '''
 
+UPSTREAM = 0
+DOWNSTREAM = 1
+
 def solution(A, B):
     stack = []
-    count = 0
+    alive = 0
 
-    for i in range(len(A)):
-        cur_size = A[i]
-        cur_dist = B[i]
+    for size, dist in zip(A, B):
+        if dist == DOWNSTREAM:
+            stack.append(size)
+            continue
 
-        while stack:
-            prev_size, prev_dist = stack.pop()
+        while stack and stack[-1] < size:
+            stack.pop()
 
-            if prev_dist == cur_dist:
-                stack.append((prev_size, prev_dist))
-                break
+        if not stack:
+            alive += 1
 
-            count += 1
-
-            if prev_size < cur_size:
-                cur_size = prev_size
-                cur_dist = prev_dist
-                break
-
-        stack.append((cur_size, cur_dist))
-
-    return count
+    return alive + len(stack)
