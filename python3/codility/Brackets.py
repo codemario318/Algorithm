@@ -70,7 +70,7 @@ def solution(S):
             stack.append(b)
             continue
 
-        if stack[-1] == CLOSE[b]:
+        if stack and stack[-1] == CLOSE[b]:
             stack.pop()
         else:
             return FAIL
